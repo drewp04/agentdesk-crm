@@ -393,437 +393,100 @@ input:checked + .toggle-sl:before { transform:translateX(18px); }
 
     <!-- DASHBOARD TAB -->
     <div class="tab-view active" id="tab-dashboard">
-      <!-- STATS -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Total Pipeline</div>
-          <div class="stat-value">$4.2M</div>
-          <div class="stat-sub"><span>↑ 18%</span> vs last month</div>
-        </div>
-        <div class="stat-card">
           <div class="stat-label">Active Leads</div>
-          <div class="stat-value">138</div>
-          <div class="stat-sub"><span>↑ 12</span> new this week</div>
+          <div class="stat-value" id="stat-leads">--</div>
+          <div class="stat-sub">in pipeline</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Appts This Week</div>
-          <div class="stat-value">9</div>
-          <div class="stat-sub"><span>↑ 3</span> vs last week</div>
+          <div class="stat-label">Hot Leads</div>
+          <div class="stat-value accent" id="stat-hot">--</div>
+          <div class="stat-sub">need attention</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Closings MTD</div>
-          <div class="stat-value">3</div>
-          <div class="stat-sub">GCI: <span>$38,500</span></div>
+          <div class="stat-label">Convert Stage</div>
+          <div class="stat-value" id="stat-convert">--</div>
+          <div class="stat-sub">closing soon</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Team</div>
+          <div class="stat-value" id="stat-team">--</div>
+          <div class="stat-sub">active agents</div>
         </div>
       </div>
 
-      <!-- QUICK CHIPS -->
-      <div class="quick-row">
-        <div class="quick-chip"><span class="dot" style="background:var(--hot)"></span> 14 Hot Leads</div>
-        <div class="quick-chip"><span class="dot" style="background:var(--warm)"></span> 32 Warm Leads</div>
-        <div class="quick-chip"><span class="dot" style="background:var(--cold)"></span> 92 Nurturing</div>
-        <div class="quick-chip">⚡ 7 AutoTracks Active</div>
-        <div class="quick-chip">📍 Bakersfield, CA</div>
-        <div class="quick-chip" style="margin-left:auto; background: rgba(212,160,23,0.1); border-color: var(--gold-dim); color: var(--gold);">🌟 30% Conversion Rate</div>
+      <div class="chips-row">
+        <div class="chip"><span class="chip-dot" style="background:var(--red);"></span><span id="c-hot">0</span> Hot</div>
+        <div class="chip"><span class="chip-dot" style="background:var(--orange);"></span><span id="c-warm">0</span> Warm</div>
+        <div class="chip"><span class="chip-dot" style="background:var(--blue);"></span><span id="c-cold">0</span> Cold</div>
+        <div class="chip">Bakersfield, CA</div>
+        <div class="chip" style="margin-left:auto;background:rgba(45,122,79,.08);border-color:rgba(45,122,79,.2);color:var(--green);">Live</div>
       </div>
 
-      <!-- TWO-COL LAYOUT -->
-      <div style="display:grid; grid-template-columns:1fr 360px; gap:20px;">
-        <!-- ACTIVITY + PRIORITY -->
-        <div style="display:flex; flex-direction:column; gap:20px;">
-          <!-- LEAD FUNNEL CHART -->
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;">
+        <div style="display:flex;flex-direction:column;gap:20px;">
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Lead Funnel — Last 30 Days</span>
-              <select style="font-size:12px; padding:5px 10px; width:auto;">
-                <option>Last 30 Days</option>
-                <option>This Quarter</option>
-                <option>This Year</option>
-              </select>
+              <span style="font-size:15px;font-weight:700;color:var(--text);">Priority Leads</span>
+              <span style="font-size:12px;color:var(--accent);cursor:pointer;" onclick="showTab('contacts',null)">View All</span>
             </div>
-            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:12px;">
-              <div style="text-align:center;">
-                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Capture</div>
-                <div class="chart-bar" style="justify-content:center;">
-                  <div class="bar" style="height:88%; background:linear-gradient(0deg, #1a4a8a, #3498DB);" title="88"></div>
-                </div>
-                <div class="bar-val" style="color:#3498DB;">88</div>
-              </div>
-              <div style="text-align:center;">
-                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Identify</div>
-                <div class="chart-bar" style="justify-content:center;">
-                  <div class="bar" style="height:60%; background:linear-gradient(0deg, #4a1a8a, #9B59B6);" title="53"></div>
-                </div>
-                <div class="bar-val" style="color:#9B59B6;">53</div>
-              </div>
-              <div style="text-align:center;">
-                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Nurture</div>
-                <div class="chart-bar" style="justify-content:center;">
-                  <div class="bar" style="height:38%; background:linear-gradient(0deg, #8a5a00, #F39C12);" title="34"></div>
-                </div>
-                <div class="bar-val" style="color:#F39C12;">34</div>
-              </div>
-              <div style="text-align:center;">
-                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Convert</div>
-                <div class="chart-bar" style="justify-content:center;">
-                  <div class="bar" style="height:18%; background:linear-gradient(0deg, #1a6a2a, #2ECC71);" title="16"></div>
-                </div>
-                <div class="bar-val" style="color:#2ECC71;">16</div>
-              </div>
-            </div>
+            <div id="priority-leads-table"><div class="ld"><div class="sp"></div>Loading...</div></div>
           </div>
-
-          <!-- PRIORITY LEADS -->
           <div class="card">
-            <div class="card-header">
-              <span class="card-title">🔥 Priority Leads — Action Required</span>
-              <span style="font-size:12px; color:var(--gold); cursor:pointer;">View All →</span>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Lead</th><th>Stage</th><th>Score</th><th>Last Touch</th><th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><div class="contact-name">Jacob Perez</div><div class="contact-phone">661-555-0142</div></td>
-                  <td><span class="tag tag-hot">HOT</span></td>
-                  <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">97</span></td>
-                  <td style="color:var(--danger);">4h ago</td>
-                  <td><button class="btn btn-gold" style="padding:5px 12px;font-size:11px;" onclick="showComms()">📞 Call</button></td>
-                </tr>
-                <tr>
-                  <td><div class="contact-name">Jose & Michelle R.</div><div class="contact-phone">661-555-0198</div></td>
-                  <td><span class="tag tag-buyer">CONVERT</span></td>
-                  <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">91</span></td>
-                  <td style="color:var(--warning);">1d ago</td>
-                  <td><button class="btn btn-gold" style="padding:5px 12px;font-size:11px;" onclick="showComms()">💬 Text</button></td>
-                </tr>
-                <tr>
-                  <td><div class="contact-name">Maria Gutierrez</div><div class="contact-phone">661-555-0277</div></td>
-                  <td><span class="tag tag-warm">WARM</span></td>
-                  <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">74</span></td>
-                  <td>2d ago</td>
-                  <td><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;">📧 Email</button></td>
-                </tr>
-                <tr>
-                  <td><div class="contact-name">David Kim</div><div class="contact-phone">661-555-0311</div></td>
-                  <td><span class="tag tag-seller">SELLER</span></td>
-                  <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">68</span></td>
-                  <td>3d ago</td>
-                  <td><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;">📅 Appt</button></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="card-header"><span style="font-size:15px;font-weight:700;color:var(--text);">Pipeline Funnel</span></div>
+            <div id="funnel-chart" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div>
           </div>
         </div>
-
-        <!-- ACTIVITY FEED + LEADERBOARD -->
-        <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:flex;flex-direction:column;gap:20px;">
           <div class="card">
-            <div class="card-header"><span class="card-title">📡 Live Activity</span></div>
-            <div style="max-height:220px; overflow-y:auto;">
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(52,152,219,0.15); color:#3498DB;">🏠</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Jacob P.</strong> viewed 3 properties on IDX</div>
-                  <div class="activity-time">2 min ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(46,204,113,0.15); color:#2ECC71;">✅</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Maria G.</strong> opened email — Market Report</div>
-                  <div class="activity-time">18 min ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(212,160,23,0.15); color:var(--gold);">💬</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>New lead</strong> from Facebook Ad — Carlos V.</div>
-                  <div class="activity-time">34 min ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(231,76,60,0.15); color:#E74C3C;">📞</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Missed call</strong> from Jennifer L. (661-555-0455)</div>
-                  <div class="activity-time">1h ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(155,89,182,0.15); color:#9B59B6;">🤖</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>AI</strong> sent follow-up to 6 cold leads</div>
-                  <div class="activity-time">2h ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon" style="background:rgba(46,204,113,0.15); color:#2ECC71;">🎉</div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Closed!</strong> 13627 Foyers Falls Dr — $419,999</div>
-                  <div class="activity-time">Yesterday</div>
-                </div>
-              </div>
-            </div>
+            <div class="card-header"><span style="font-size:15px;font-weight:700;color:var(--text);">Live Activity</span></div>
+            <div id="activity-feed" style="max-height:220px;overflow-y:auto;"><div class="ld"><div class="sp"></div></div></div>
           </div>
-
           <div class="card">
-            <div class="card-header"><span class="card-title">🏆 Team GCI Leaderboard</span></div>
-            <div class="leaderboard-row">
-              <div class="lb-rank gold">1</div>
-              <div class="avatar" style="width:30px;height:30px;font-size:12px;">AP</div>
-              <div style="flex:1;font-size:13px;font-weight:600;">Andrew Perez</div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:100%"></div></div>
-              <div class="lb-gci">$38,500</div>
-            </div>
-            <div class="leaderboard-row">
-              <div class="lb-rank silver">2</div>
-              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#3B5998;color:#fff;">MR</div>
-              <div style="flex:1;font-size:13px;font-weight:600;">Maria Rivera</div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:74%"></div></div>
-              <div class="lb-gci">$28,400</div>
-            </div>
-            <div class="leaderboard-row">
-              <div class="lb-rank bronze">3</div>
-              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#2E7D32;color:#fff;">TN</div>
-              <div style="flex:1;font-size:13px;font-weight:600;">Tom Nguyen</div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:52%"></div></div>
-              <div class="lb-gci">$19,800</div>
-            </div>
-            <div class="leaderboard-row">
-              <div class="lb-rank" style="color:var(--text-dim);">4</div>
-              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#6A1B9A;color:#fff;">SC</div>
-              <div style="flex:1;font-size:13px;font-weight:600;">Sarah Chen</div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:36%"></div></div>
-              <div class="lb-gci">$13,700</div>
-            </div>
+            <div class="card-header"><span style="font-size:15px;font-weight:700;color:var(--text);">Leaderboard</span></div>
+            <div id="leaderboard"><div class="ld"><div class="sp"></div></div></div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- PIPELINE TAB -->
+    <!-- PIPELINE TAB -->
     <div class="tab-view" id="tab-pipeline">
       <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
-        <div class="quick-chip">📋 24 Total Leads</div>
-        <div class="quick-chip">💰 $4.2M Pipeline Value</div>
-        <div style="margin-left:auto;display:flex;gap:10px;">
-          <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
-            <option>All Leads</option><option>My Leads</option><option>Team Leads</option>
-          </select>
-          <button class="btn btn-gold" onclick="openAdd()">+ New Lead</button>
-        </div>
+        <div style="font-size:13px;color:var(--muted);">Total: <strong id="pipeline-total">0</strong> leads</div>
+        <select id="pipeline-filter-agent" style="font-size:12px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;color:var(--text);margin-left:auto;outline:none;" onchange="loadPipeline()"><option value="">All Agents</option></select>
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ New Lead</button>
       </div>
       <div class="pipeline-grid">
-        <!-- CAPTURE -->
-        <div class="stage-col stage-capture">
-          <div class="stage-header">
-            <span class="stage-name">📥 Capture</span>
-            <span class="stage-count">8 leads</span>
-          </div>
-          <div class="stage-leads">
-            <div class="lead-card">
-              <span class="lead-score score-warm">72</span>
-              <div class="lead-name">Carlos Valenzuela</div>
-              <div class="lead-meta">Facebook Ad · Bakersfield</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-new">NEW</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-cold">45</span>
-              <div class="lead-name">Jennifer Lopez</div>
-              <div class="lead-meta">Google · NW Bakersfield</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-warm">61</span>
-              <div class="lead-name">Roberto Flores</div>
-              <div class="lead-meta">Zillow Import</div>
-              <div class="lead-tags"><span class="tag tag-seller">SELLER</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-cold">38</span>
-              <div class="lead-name">Linda Park</div>
-              <div class="lead-meta">Open House Sign-In</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-cold">COLD</span></div>
-            </div>
-          </div>
-        </div>
-        <!-- IDENTIFY -->
-        <div class="stage-col stage-identify">
-          <div class="stage-header">
-            <span class="stage-name">🔍 Identify</span>
-            <span class="stage-count">7 leads</span>
-          </div>
-          <div class="stage-leads">
-            <div class="lead-card">
-              <span class="lead-score score-warm">74</span>
-              <div class="lead-name">Maria Gutierrez</div>
-              <div class="lead-meta">$350–420K · 3–4 bed</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-warm">WARM</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-warm">68</span>
-              <div class="lead-name">David Kim</div>
-              <div class="lead-meta">Seller · Pool req.</div>
-              <div class="lead-tags"><span class="tag tag-seller">SELLER</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-warm">65</span>
-              <div class="lead-name">Ana & Luis Torres</div>
-              <div class="lead-meta">First-time buyer · FHA</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
-            </div>
-          </div>
-        </div>
-        <!-- NURTURE -->
-        <div class="stage-col stage-nurture">
-          <div class="stage-header">
-            <span class="stage-name">💧 Nurture</span>
-            <span class="stage-count">6 leads</span>
-          </div>
-          <div class="stage-leads">
-            <div class="lead-card">
-              <span class="lead-score score-hot">91</span>
-              <div class="lead-name">Jose & Michelle R.</div>
-              <div class="lead-meta">Final walkthrough ready</div>
-              <div class="lead-tags"><span class="tag tag-hot">HOT</span><span class="tag tag-buyer">BUYER</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-warm">77</span>
-              <div class="lead-name">Brenda Castillo</div>
-              <div class="lead-meta">Listing consult booked</div>
-              <div class="lead-tags"><span class="tag tag-seller">SELLER</span><span class="tag tag-warm">WARM</span></div>
-            </div>
-            <div class="lead-card">
-              <span class="lead-score score-warm">69</span>
-              <div class="lead-name">Mike Sullivan</div>
-              <div class="lead-meta">Pre-approval pending</div>
-              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
-            </div>
-          </div>
-        </div>
-        <!-- CONVERT -->
-        <div class="stage-col stage-convert">
-          <div class="stage-header">
-            <span class="stage-name">✅ Convert</span>
-            <span class="stage-count">3 leads</span>
-          </div>
-          <div class="stage-leads">
-            <div class="lead-card" style="border-color: rgba(46,204,113,0.3);">
-              <span class="lead-score score-hot">97</span>
-              <div class="lead-name">Jacob Perez</div>
-              <div class="lead-meta">Under contract · $419,999</div>
-              <div class="lead-tags"><span class="tag tag-hot">CLOSING</span></div>
-            </div>
-            <div class="lead-card" style="border-color: rgba(46,204,113,0.3);">
-              <span class="lead-score score-hot">93</span>
-              <div class="lead-name">3707 Panorama Dr</div>
-              <div class="lead-meta">Active listing · Pool</div>
-              <div class="lead-tags"><span class="tag tag-seller">LISTING</span></div>
-            </div>
-          </div>
-        </div>
+        <div class="stage-col"><div class="stage-header"><span class="stage-name" style="color:var(--blue);">Capture</span><span class="stage-count" id="count-capture">0</span></div><div class="stage-leads" id="stage-capture"><div class="ld"><div class="sp"></div></div></div></div>
+        <div class="stage-col"><div class="stage-header"><span class="stage-name" style="color:var(--purple);">Identify</span><span class="stage-count" id="count-identify">0</span></div><div class="stage-leads" id="stage-identify"><div class="ld"><div class="sp"></div></div></div></div>
+        <div class="stage-col"><div class="stage-header"><span class="stage-name" style="color:var(--orange);">Nurture</span><span class="stage-count" id="count-nurture">0</span></div><div class="stage-leads" id="stage-nurture"><div class="ld"><div class="sp"></div></div></div></div>
+        <div class="stage-col"><div class="stage-header"><span class="stage-name" style="color:var(--green);">Convert</span><span class="stage-count" id="count-convert">0</span></div><div class="stage-leads" id="stage-convert"><div class="ld"><div class="sp"></div></div></div></div>
       </div>
     </div>
 
     <!-- CONTACTS TAB -->
+    <!-- CONTACTS TAB -->
     <div class="tab-view" id="tab-contacts">
-      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
-        <div class="search-bar" style="width:320px;">
-          <span>🔍</span>
-          <input type="text" placeholder="Search contacts...">
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;align-items:center;gap:7px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;width:260px;">
+          <span style="color:var(--dim);">&#128269;</span>
+          <input style="background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;" placeholder="Search..." oninput="filterC(this.value)">
         </div>
-        <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
-          <option>All Contacts</option><option>Buyers</option><option>Sellers</option><option>Past Clients</option>
+        <select id="filter-type" style="font-size:12px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;color:var(--text);outline:none;" onchange="filterC()">
+          <option value="">All Types</option><option value="buyer">Buyer</option><option value="seller">Seller</option><option value="both">Both</option><option value="past_client">Past Client</option>
         </select>
-        <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
-          <option>All Stages</option><option>Hot</option><option>Warm</option><option>Cold</option>
+        <select id="filter-stage" style="font-size:12px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;color:var(--text);outline:none;" onchange="filterC()">
+          <option value="">All Stages</option><option value="capture">Capture</option><option value="identify">Identify</option><option value="nurture">Nurture</option><option value="convert">Convert</option>
         </select>
-        <button class="btn btn-gold" style="margin-left:auto;" onclick="openAdd()">+ Add Contact</button>
+        <select id="filter-temp" style="font-size:12px;padding:6px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;color:var(--text);outline:none;" onchange="filterC()">
+          <option value="">All Temps</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="cold">Cold</option>
+        </select>
+        <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="openAdd()">+ Add Contact</button>
       </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Name</th><th>Contact</th><th>Type</th><th>Stage</th><th>Score</th><th>Source</th><th>Last Activity</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="contacts-table-wrap">
-              <tr>
-                <td><div class="contact-name">Jacob Perez</div></td>
-                <td><div class="contact-phone">661-555-0142</div><div class="contact-email">jperez@email.com</div></td>
-                <td><span class="tag tag-buyer">BUYER</span></td>
-                <td><span class="tag tag-hot">CONVERT</span></td>
-                <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">97</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Referral</td>
-                <td><span class="activity-dot" style="background:var(--success)"></span>4h ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">Jose & Michelle R.</div></td>
-                <td><div class="contact-phone">661-555-0198</div><div class="contact-email">jmrodriguez@email.com</div></td>
-                <td><span class="tag tag-buyer">BUYER</span></td>
-                <td><span class="tag tag-hot">NURTURE</span></td>
-                <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">91</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Google Ad</td>
-                <td><span class="activity-dot" style="background:var(--warning)"></span>1d ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">Maria Gutierrez</div></td>
-                <td><div class="contact-phone">661-555-0277</div><div class="contact-email">mgutierrez@email.com</div></td>
-                <td><span class="tag tag-buyer">BUYER</span></td>
-                <td><span class="tag tag-warm">IDENTIFY</span></td>
-                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">74</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Facebook Ad</td>
-                <td><span class="activity-dot" style="background:var(--warning)"></span>2d ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">David Kim</div></td>
-                <td><div class="contact-phone">661-555-0311</div><div class="contact-email">dkim@email.com</div></td>
-                <td><span class="tag tag-seller">SELLER</span></td>
-                <td><span class="tag tag-warm">IDENTIFY</span></td>
-                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">68</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Open House</td>
-                <td><span class="activity-dot" style="background:var(--info)"></span>3d ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">Brenda Castillo</div></td>
-                <td><div class="contact-phone">661-555-0388</div><div class="contact-email">bcastillo@email.com</div></td>
-                <td><span class="tag tag-seller">SELLER</span></td>
-                <td><span class="tag tag-warm">NURTURE</span></td>
-                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">77</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Referral</td>
-                <td><span class="activity-dot" style="background:var(--success)"></span>1d ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">Carlos Valenzuela</div></td>
-                <td><div class="contact-phone">661-555-0421</div><div class="contact-email">cvalenz@email.com</div></td>
-                <td><span class="tag tag-buyer">BUYER</span></td>
-                <td><span class="tag tag-new">CAPTURE</span></td>
-                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">72</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Facebook Ad</td>
-                <td><span class="activity-dot" style="background:var(--success)"></span>Today</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-              <tr>
-                <td><div class="contact-name">Ana & Luis Torres</div></td>
-                <td><div class="contact-phone">661-555-0502</div><div class="contact-email">torres.family@email.com</div></td>
-                <td><span class="tag tag-buyer">BUYER</span></td>
-                <td><span class="tag tag-warm">IDENTIFY</span></td>
-                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">65</span></td>
-                <td style="color:var(--text-muted);font-size:12px;">Zillow</td>
-                <td><span class="activity-dot" style="background:var(--warning)"></span>2d ago</td>
-                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div class="card"><div id="contacts-table-wrap"><div class="ld"><div class="sp"></div>Loading...</div></div></div>
     </div>
 
     <!-- COMMUNICATIONS TAB -->
@@ -1224,81 +887,26 @@ input:checked + .toggle-sl:before { transform:translateX(18px); }
     </div>
 
     <!-- REPORTS TAB -->
+    <!-- REPORTS TAB -->
     <div class="tab-view" id="tab-reports">
-      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
-        <button class="btn btn-gold" style="font-size:12px;">📊 This Month</button>
-        <button class="btn btn-outline" style="font-size:12px;">This Quarter</button>
-        <button class="btn btn-outline" style="font-size:12px;">YTD</button>
-        <button class="btn btn-outline" style="margin-left:auto;font-size:12px;">⬇️ Export PDF</button>
+      <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;">
+        <button class="btn btn-primary btn-sm">This Month</button>
+        <button class="btn btn-outline btn-sm">Quarter</button>
+        <button class="btn btn-outline btn-sm">YTD</button>
       </div>
-      <div class="stats-grid" style="margin-bottom:20px;">
-        <div class="stat-card">
-          <div class="stat-label">GCI This Month</div>
-          <div class="stat-value">$38,500</div>
-          <div class="stat-sub"><span>↑ 22%</span> vs last month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Leads Generated</div>
-          <div class="stat-value">88</div>
-          <div class="stat-sub"><span>↑ 14</span> new this month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Conversion Rate</div>
-          <div class="stat-value">30%</div>
-          <div class="stat-sub"><span>↑ 4%</span> vs last month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Cost Per Lead</div>
-          <div class="stat-value">$24</div>
-          <div class="stat-sub">Google: $31 · FB: $18</div>
-        </div>
+      <div class="stats-grid" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-label">Total Contacts</div><div class="stat-value" id="rpt-total">--</div><div class="stat-sub">in database</div></div>
+        <div class="stat-card"><div class="stat-label">Hot Leads</div><div class="stat-value accent" id="rpt-hot">--</div><div class="stat-sub">need action</div></div>
+        <div class="stat-card"><div class="stat-label">Convert Stage</div><div class="stat-value" id="rpt-convert">--</div><div class="stat-sub">closing soon</div></div>
+        <div class="stat-card"><div class="stat-label">Buyers / Sellers</div><div class="stat-value" id="rpt-ratio">--</div><div class="stat-sub">split</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div class="card">
-          <div class="card-header"><span class="card-title">Lead Sources</span></div>
-          <table>
-            <thead><tr><th>Source</th><th>Leads</th><th>Conv.</th><th>GCI</th></tr></thead>
-            <tbody>
-              <tr><td>Referral</td><td>18</td><td><span style="color:var(--success);">44%</span></td><td style="color:var(--gold);">$21,200</td></tr>
-              <tr><td>Google Ads</td><td>31</td><td><span style="color:var(--warning);">28%</span></td><td style="color:var(--gold);">$10,800</td></tr>
-              <tr><td>Facebook Ads</td><td>22</td><td><span style="color:var(--warning);">24%</span></td><td style="color:var(--gold);">$4,900</td></tr>
-              <tr><td>Zillow</td><td>11</td><td><span style="color:var(--info);">18%</span></td><td style="color:var(--gold);">$1,600</td></tr>
-              <tr><td>Open House</td><td>6</td><td><span style="color:var(--success);">33%</span></td><td style="color:var(--gold);">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Monthly GCI Trend</span></div>
-          <div style="padding:8px 0;">
-            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 8px;">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="font-size:10px;color:var(--text-dim);">$28k</div>
-                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:68%;min-height:8px;"></div>
-                <div style="font-size:10px;color:var(--text-dim);">Jan</div>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="font-size:10px;color:var(--text-dim);">$19k</div>
-                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:46%;min-height:8px;"></div>
-                <div style="font-size:10px;color:var(--text-dim);">Feb</div>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="font-size:10px;color:var(--text-dim);">$31k</div>
-                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:76%;min-height:8px;"></div>
-                <div style="font-size:10px;color:var(--text-dim);">Mar</div>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="font-size:10px;color:var(--accent);font-weight:700;">$38.5k</div>
-                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold),var(--accent));border-radius:4px 4px 0 0;height:93%;min-height:8px;border:1px solid var(--accent);"></div>
-                <div style="font-size:10px;color:var(--gold);font-weight:700;">Apr</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="card-header"><span style="font-size:15px;font-weight:700;">Lead Sources</span></div><div id="rpt-sources-table"><div class="ld"><div class="sp"></div></div></div></div>
+        <div class="card"><div class="card-header"><span style="font-size:15px;font-weight:700;">Pipeline Breakdown</span></div><div id="rpt-pipeline-chart"><div class="ld"><div class="sp"></div></div></div></div>
       </div>
     </div>
 
-  </div><!-- /content -->
-</main>
+
 
     <!-- PLANS & FEATURES TAB -->
 
