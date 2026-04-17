@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentDesk CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0B1628;
+  --navy-light: #132240;
+  --navy-mid: #1C3158;
+  --gold: #B8860B;
+  --gold-light: #D4A017;
+  --gold-dim: #8A6810;
+  --accent: #D4A017;
+  --bg: #F4F6FA;
+  --card: #FFFFFF;
+  --card2: #F8F9FC;
+  --text: #0F1E35;
+  --text-muted: #5A6A82;
+  --text-dim: #9AAABB;
+  --border: rgba(11,22,40,0.1);
+  --border-subtle: rgba(11,22,40,0.08);
+  --success: #1A9E5C;
+  --warning: #D4850A;
+  --danger: #D03535;
+  --info: #1A6FBF;
+  --hot: #D03535;
+  --warm: #D4850A;
+  --cold: #1A6FBF;
+  --sidebar-w: 220px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy-light);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 18px;
+  color: var(--navy);
+}
+.logo-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 2px; text-transform: uppercase; }
+nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.nav-section { margin-bottom: 4px; }
+.nav-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  padding: 10px 18px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 18px;
+  cursor: pointer; transition: all 0.15s;
+  border-left: 3px solid transparent;
+  font-weight: 500; font-size: 13.5px;
+  color: rgba(255,255,255,0.5);
+  position: relative;
+}
+.nav-item:hover { background: rgba(212,160,23,0.07); color: rgba(255,255,255,0.85); }
+.nav-item.active {
+  background: rgba(212,160,23,0.12);
+  border-left-color: var(--gold);
+  color: var(--gold);
+}
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff; font-size: 10px; font-weight: 700;
+  padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center;
+}
+.nav-badge.gold { background: var(--gold); color: var(--navy); }
+.sidebar-footer {
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff;
+  flex-shrink: 0;
+}
+.agent-info { flex: 1; min-width: 0; }
+.agent-name { font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.85); }
+.agent-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+}
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--text); letter-spacing: 0.5px;
+  flex: 1;
+}
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  width: 280px;
+}
+.search-bar input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-family: 'Barlow', sans-serif;
+  font-size: 13px; width: 100%;
+}
+.search-bar input::placeholder { color: var(--text-dim); }
+.btn {
+  padding: 8px 16px; border-radius: 7px;
+  font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  color: #fff;
+}
+.btn-gold:hover { filter: brightness(1.08); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* CONTENT AREA */
+.content {
+  padding: 24px;
+  flex: 1;
+}
+.tab-view { display: none; }
+.tab-view.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 20px;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 700;
+  letter-spacing: 0.5px; color: var(--text);
+}
+
+/* STAT CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--accent));
+}
+.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700; color: var(--gold); line-height: 1; }
+.stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.stat-sub span { color: var(--success); }
+
+/* PIPELINE STAGES */
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stage-col {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stage-header {
+  padding: 12px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--card2);
+}
+.stage-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+.stage-count {
+  background: var(--bg);
+  color: var(--text-muted); font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+}
+.stage-capture .stage-name { color: #3498DB; }
+.stage-identify .stage-name { color: #9B59B6; }
+.stage-nurture .stage-name { color: var(--warning); }
+.stage-convert .stage-name { color: var(--success); }
+.stage-leads { padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+.lead-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.lead-card:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.lead-name { font-weight: 600; font-size: 13px; color: var(--text); }
+.lead-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.lead-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px; font-weight: 600; padding: 2px 7px;
+  border-radius: 10px; letter-spacing: 0.5px;
+}
+.tag-hot { background: rgba(231,76,60,0.2); color: #E74C3C; border: 1px solid rgba(231,76,60,0.3); }
+.tag-warm { background: rgba(243,156,18,0.2); color: #F39C12; border: 1px solid rgba(243,156,18,0.3); }
+.tag-cold { background: rgba(52,152,219,0.2); color: #3498DB; border: 1px solid rgba(52,152,219,0.3); }
+.tag-buyer { background: rgba(46,204,113,0.15); color: #2ECC71; border: 1px solid rgba(46,204,113,0.3); }
+.tag-seller { background: rgba(155,89,182,0.15); color: #9B59B6; border: 1px solid rgba(155,89,182,0.3); }
+.tag-new { background: rgba(52,152,219,0.15); color: #3498DB; border: 1px solid rgba(52,152,219,0.3); }
+.lead-score {
+  float: right;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 700;
+}
+.score-hot { color: var(--hot); }
+.score-warm { color: var(--warm); }
+.score-cold { color: var(--cold); }
+
+/* CONTACTS TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; padding: 10px 14px;
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px; color: var(--text);
+  vertical-align: middle;
+}
+tr:hover td { background: rgba(184,134,11,0.04); }
+.contact-name { font-weight: 600; color: var(--text); }
+.contact-phone { color: var(--text-muted); }
+.contact-email { color: var(--info); font-size: 12px; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; margin-right: 6px;
+}
+
+/* AUTOMATION / AUTOTRACKS */
+.tracks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.track-card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer; transition: all 0.15s;
+}
+.track-card:hover { border-color: var(--gold-dim); }
+.track-icon { font-size: 28px; margin-bottom: 10px; }
+.track-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.track-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+.track-stats { display: flex; gap: 12px; }
+.track-stat { font-size: 11px; color: var(--text-dim); }
+.track-stat strong { color: var(--gold); font-size: 14px; font-weight: 700; display: block; }
+.toggle-switch {
+  position: relative; width: 40px; height: 22px;
+  display: inline-block;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #D1D5DB; border-radius: 22px;
+  transition: 0.2s; border: 1px solid var(--border);
+}
+.toggle-slider:before {
+  content: ''; position: absolute;
+  height: 16px; width: 16px;
+  left: 2px; bottom: 2px;
+  background: #fff; border-radius: 50%;
+  transition: 0.2s;
+}
+input:checked + .toggle-slider { background: var(--gold); border-color: var(--gold); }
+input:checked + .toggle-slider:before { transform: translateX(18px); background: #fff; }
+
+/* COMMUNICATIONS */
+.comms-layout { display: grid; grid-template-columns: 320px 1fr; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.comms-list { background: var(--card); border-right: 1px solid var(--border); }
+.comms-list-header { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.comms-search { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 7px 12px; width: 100%; color: var(--text); font-size: 13px; outline: none; }
+.comms-search::placeholder { color: var(--text-dim); }
+.convo-item {
+  padding: 12px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: all 0.1s; display: flex; gap: 10px; align-items: flex-start;
+}
+.convo-item:hover { background: rgba(184,134,11,0.04); }
+.convo-item.active { background: rgba(184,134,11,0.07); border-left: 3px solid var(--gold); }
+.convo-avatar {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  background: var(--navy-mid); display: flex; align-items: center;
+  justify-content: center; font-weight: 700; font-size: 14px; color: #fff;
+}
+.convo-name { font-weight: 600; font-size: 13px; color: var(--text); }
+.convo-preview { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.convo-time { font-size: 11px; color: var(--text-dim); margin-left: auto; flex-shrink: 0; }
+.comms-panel { background: var(--bg); display: flex; flex-direction: column; }
+.comms-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: var(--card); }
+.comms-header .avatar { width: 40px; height: 40px; }
+.comms-header-name { font-weight: 700; font-size: 15px; }
+.comms-header-meta { font-size: 12px; color: var(--text-muted); }
+.messages { flex: 1; padding: 20px; overflow-y: auto; max-height: 340px; display: flex; flex-direction: column; gap: 12px; }
+.msg { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+.msg-in { background: var(--card); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; color: var(--text); }
+.msg-out { background: var(--navy-mid); align-self: flex-end; border-bottom-right-radius: 4px; color: #fff; }
+.msg-time { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+.compose-bar { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: var(--card); }
+.compose-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--text); font-size: 13px; outline: none; resize: none; font-family: 'Barlow', sans-serif; }
+.compose-input::placeholder { color: var(--text-dim); }
+
+/* AI PANEL */
+.ai-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+.ai-chat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.ai-messages { flex: 1; padding: 20px; max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.ai-msg { display: flex; gap: 10px; align-items: flex-start; }
+.ai-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; color: #fff; font-weight: 700;
+}
+.user-avatar { background: var(--navy-mid); color: #fff; }
+.ai-bubble { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; border-top-left-radius: 3px; padding: 10px 14px; font-size: 13px; line-height: 1.6; flex: 1; color: var(--text); }
+.user-bubble { background: rgba(184,134,11,0.07); border-color: rgba(184,134,11,0.2); border-top-right-radius: 3px; border-top-left-radius: 10px; }
+.ai-compose { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+.ai-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; color: var(--text); font-size: 13px; outline: none; font-family: 'Barlow', sans-serif; }
+.ai-input::placeholder { color: var(--text-dim); }
+.ai-sidebar-panel {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ai-suggestion {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer; transition: all 0.15s;
+}
+.ai-suggestion:hover { border-color: var(--gold); background: var(--card2); }
+.suggestion-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.suggestion-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+/* TEAM VIEW */
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.agent-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.agent-big-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy-mid), var(--navy));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 22px; color: #fff;
+  margin: 0 auto 12px;
+  border: 2px solid var(--border);
+}
+.agent-card-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.agent-card-role { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+.agent-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.agent-stat-item { background: var(--card2); border-radius: 8px; padding: 8px; border: 1px solid var(--border-subtle); }
+.agent-stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+.agent-stat-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; padding: 3px 9px; border-radius: 20px;
+  font-weight: 600;
+}
+.status-online { background: rgba(26,158,92,0.1); color: var(--success); border: 1px solid rgba(26,158,92,0.25); }
+.status-offline { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* IDX / PROPERTY ALERTS */
+.alerts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.prop-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer; transition: all 0.15s;
+}
+.prop-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.prop-img {
+  height: 130px;
+  background: linear-gradient(135deg, #1C3158, #0B1628);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; position: relative;
+}
+.prop-badge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+}
+.badge-new { background: var(--info); color: #fff; }
+.badge-pricedrop { background: var(--success); color: #fff; }
+.badge-hot { background: var(--danger); color: #fff; }
+.prop-info { padding: 12px 14px; }
+.prop-price { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--gold); }
+.prop-address { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.prop-details { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--text-dim); }
+.prop-lead { font-size: 11px; color: var(--text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.prop-lead strong { color: var(--gold); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  width: 560px; max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1/-1; }
+label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+input[type=text], input[type=email], input[type=tel], select, textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+select { appearance: none; }
+select option { background: var(--card); color: var(--text); }
+textarea { resize: vertical; min-height: 80px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+/* ACTIVITY FEED */
+.activity-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.activity-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.activity-body { flex: 1; }
+.activity-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.activity-text strong { color: var(--gold); }
+.activity-time { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+/* CHARTS PLACEHOLDER */
+.chart-bar {
+  display: flex; align-items: flex-end;
+  gap: 6px; height: 100px; padding: 8px 0;
+}
+.bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  background: linear-gradient(0deg, var(--gold-dim), var(--gold));
+  transition: all 0.3s; cursor: pointer; min-width: 18px;
+  position: relative;
+}
+.bar:hover { filter: brightness(1.2); }
+.bar-label { text-align: center; font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+.bar-val { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--gold); text-align: center; margin-bottom: 4px; }
+
+/* LEADERBOARD */
+.leaderboard-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
+}
+.lb-rank {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 700;
+  width: 28px; text-align: center;
+}
+.lb-rank.gold { color: var(--gold); }
+.lb-rank.silver { color: #888; }
+.lb-rank.bronze { color: #CD7F32; }
+.lb-bar-wrap { flex: 1; background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; border: 1px solid var(--border); }
+.lb-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+.lb-gci { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--gold); min-width: 80px; text-align: right; }
+
+/* NOTIFICATION DOT */
+.notif-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--danger); position: absolute; top: 6px; right: 14px;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* QUICK STATS ROW */
+.quick-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.quick-chip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  display: flex; align-items: center; gap: 7px;
+  cursor: pointer; transition: all 0.15s;
+  color: var(--text-muted);
+}
+.quick-chip:hover { border-color: var(--gold); color: var(--text); }
+.quick-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* PLANS & FEATURES */
+.plans-header {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.plans-intro {
+  padding: 28px 24px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.plans-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 6px;
+}
+.plans-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px;
+}
+.plans-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.plans-cols {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.plan-col {
+  padding: 24px 16px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  position: relative;
+}
+.plan-col:last-child { border-right: none; }
+.plan-col.featured {
+  background: rgba(184,134,11,0.04);
+  border-top: 2px solid var(--gold);
+}
+.plan-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gold);
+  background: rgba(212,160,23,0.15);
+  padding: 3px 8px; border-radius: 10px;
+}
+.plan-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 700; letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.plan-users {
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.plan-btn { width: 100%; font-size: 12px; padding: 8px 12px; }
+
+.feat-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.feat-section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.feat-section-header:hover { background: rgba(184,134,11,0.03); }
+.feat-section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: 1px;
+  color: var(--text);
+}
+.feat-chevron {
+  color: var(--gold); font-size: 16px;
+  transition: transform 0.2s;
+}
+.feat-section.collapsed .feat-chevron { transform: rotate(-90deg); }
+.feat-section.collapsed .feat-rows { display: none; }
+
+.feat-rows { display: flex; flex-direction: column; }
+.feat-header-row {
+  display: grid;
+  grid-template-columns: 260px repeat(4, 1fr);
+  border-bottom: 1px solid var(--border);
+  background: var(--card2);
+}
+.feat-col-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-dim);
+  padding: 10px 0;
+  text-align: center;
+}
+.feat-row {
+  display: grid;
+  grid-template-columns: 260px repeat(4, 1fr);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.1s;
+}
+.feat-row:last-child { border-bottom: none; }
+.feat-row:hover { background: rgba(184,134,11,0.03); }
+.feat-name {
+  padding: 13px 20px;
+  font-size: 13px; color: var(--text-muted);
+  display: flex; align-items: center;
+  border-right: 1px solid var(--border-subtle);
+}
+.feat-cell {
+  display: flex; align-items: center; justify-content: center;
+  padding: 13px 8px;
+  text-align: center;
+  border-right: 1px solid var(--border-subtle);
+}
+.feat-cell:last-child { border-right: none; }
+.featured-col {
+  background: rgba(184,134,11,0.04);
+  border-right: 1px solid rgba(184,134,11,0.15) !important;
+  border-left: 1px solid rgba(184,134,11,0.15);
+}
+.check {
+  color: var(--success);
+  font-size: 15px; font-weight: 700;
+}
+.feat-text {
+  font-size: 12px; color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
+  .tracks-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .alerts-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">A</div>
+    <div>
+      <div class="logo-text">AgentDesk</div>
+      <div class="logo-sub">CRM Platform</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="showTab('dashboard')">Dashboard</div>
+      <div class="nav-item" onclick="showTab('pipeline')">Pipeline<span class="nav-badge">24</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Leads & Contacts</div>
+      <div class="nav-item" onclick="showTab('contacts')">Contacts</div>
+      <div class="nav-item" onclick="showTab('idx')">Property Alerts<span class="nav-badge gold">7</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Engagement</div>
+      <div class="nav-item" onclick="showTab('comms')">Communications<span class="nav-badge">3</span><span class="notif-dot"></span></div>
+      <div class="nav-item" onclick="showTab('automation')">AutoTracks</div>
+      <div class="nav-item" onclick="showTab('ai')">AI Assistant</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Business</div>
+      <div class="nav-item" onclick="showTab('team')">Team</div>
+      <div class="nav-item" onclick="showTab('reports')">Reports</div>
+      <div class="nav-item" onclick="showTab('plans')">Plans & Features</div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar">AP</div>
+    <div class="agent-info">
+      <div class="agent-name">Andrew Perez</div>
+      <div class="agent-role">DRE #01965640</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="page-title" id="page-title">Dashboard</div>
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search leads, contacts, properties...">
+    </div>
+    <button class="btn btn-outline" onclick="openAdd()">+ Add Lead</button>
+    <button class="btn btn-gold">📞 Call Queue (4)</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-view active" id="tab-dashboard">
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Pipeline</div>
+          <div class="stat-value">$4.2M</div>
+          <div class="stat-sub"><span>↑ 18%</span> vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Leads</div>
+          <div class="stat-value">138</div>
+          <div class="stat-sub"><span>↑ 12</span> new this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Appts This Week</div>
+          <div class="stat-value">9</div>
+          <div class="stat-sub"><span>↑ 3</span> vs last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Closings MTD</div>
+          <div class="stat-value">3</div>
+          <div class="stat-sub">GCI: <span>$38,500</span></div>
+        </div>
+      </div>
+
+      <!-- QUICK CHIPS -->
+      <div class="quick-row">
+        <div class="quick-chip"><span class="dot" style="background:var(--hot)"></span> 14 Hot Leads</div>
+        <div class="quick-chip"><span class="dot" style="background:var(--warm)"></span> 32 Warm Leads</div>
+        <div class="quick-chip"><span class="dot" style="background:var(--cold)"></span> 92 Nurturing</div>
+        <div class="quick-chip">⚡ 7 AutoTracks Active</div>
+        <div class="quick-chip">📍 Bakersfield, CA</div>
+        <div class="quick-chip" style="margin-left:auto; background: rgba(212,160,23,0.1); border-color: var(--gold-dim); color: var(--gold);">🌟 30% Conversion Rate</div>
+      </div>
+
+      <!-- TWO-COL LAYOUT -->
+      <div style="display:grid; grid-template-columns:1fr 360px; gap:20px;">
+        <!-- ACTIVITY + PRIORITY -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <!-- LEAD FUNNEL CHART -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Lead Funnel — Last 30 Days</span>
+              <select style="font-size:12px; padding:5px 10px; width:auto;">
+                <option>Last 30 Days</option>
+                <option>This Quarter</option>
+                <option>This Year</option>
+              </select>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:12px;">
+              <div style="text-align:center;">
+                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Capture</div>
+                <div class="chart-bar" style="justify-content:center;">
+                  <div class="bar" style="height:88%; background:linear-gradient(0deg, #1a4a8a, #3498DB);" title="88"></div>
+                </div>
+                <div class="bar-val" style="color:#3498DB;">88</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Identify</div>
+                <div class="chart-bar" style="justify-content:center;">
+                  <div class="bar" style="height:60%; background:linear-gradient(0deg, #4a1a8a, #9B59B6);" title="53"></div>
+                </div>
+                <div class="bar-val" style="color:#9B59B6;">53</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Nurture</div>
+                <div class="chart-bar" style="justify-content:center;">
+                  <div class="bar" style="height:38%; background:linear-gradient(0deg, #8a5a00, #F39C12);" title="34"></div>
+                </div>
+                <div class="bar-val" style="color:#F39C12;">34</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Convert</div>
+                <div class="chart-bar" style="justify-content:center;">
+                  <div class="bar" style="height:18%; background:linear-gradient(0deg, #1a6a2a, #2ECC71);" title="16"></div>
+                </div>
+                <div class="bar-val" style="color:#2ECC71;">16</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRIORITY LEADS -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🔥 Priority Leads — Action Required</span>
+              <span style="font-size:12px; color:var(--gold); cursor:pointer;">View All →</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Lead</th><th>Stage</th><th>Score</th><th>Last Touch</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="contact-name">Jacob Perez</div><div class="contact-phone">661-555-0142</div></td>
+                  <td><span class="tag tag-hot">HOT</span></td>
+                  <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">97</span></td>
+                  <td style="color:var(--danger);">4h ago</td>
+                  <td><button class="btn btn-gold" style="padding:5px 12px;font-size:11px;" onclick="showComms()">📞 Call</button></td>
+                </tr>
+                <tr>
+                  <td><div class="contact-name">Jose & Michelle R.</div><div class="contact-phone">661-555-0198</div></td>
+                  <td><span class="tag tag-buyer">CONVERT</span></td>
+                  <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">91</span></td>
+                  <td style="color:var(--warning);">1d ago</td>
+                  <td><button class="btn btn-gold" style="padding:5px 12px;font-size:11px;" onclick="showComms()">💬 Text</button></td>
+                </tr>
+                <tr>
+                  <td><div class="contact-name">Maria Gutierrez</div><div class="contact-phone">661-555-0277</div></td>
+                  <td><span class="tag tag-warm">WARM</span></td>
+                  <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">74</span></td>
+                  <td>2d ago</td>
+                  <td><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;">📧 Email</button></td>
+                </tr>
+                <tr>
+                  <td><div class="contact-name">David Kim</div><div class="contact-phone">661-555-0311</div></td>
+                  <td><span class="tag tag-seller">SELLER</span></td>
+                  <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:22px;font-weight:700;">68</span></td>
+                  <td>3d ago</td>
+                  <td><button class="btn btn-outline" style="padding:5px 12px;font-size:11px;">📅 Appt</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ACTIVITY FEED + LEADERBOARD -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">📡 Live Activity</span></div>
+            <div style="max-height:220px; overflow-y:auto;">
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(52,152,219,0.15); color:#3498DB;">🏠</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Jacob P.</strong> viewed 3 properties on IDX</div>
+                  <div class="activity-time">2 min ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(46,204,113,0.15); color:#2ECC71;">✅</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Maria G.</strong> opened email — Market Report</div>
+                  <div class="activity-time">18 min ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(212,160,23,0.15); color:var(--gold);">💬</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>New lead</strong> from Facebook Ad — Carlos V.</div>
+                  <div class="activity-time">34 min ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(231,76,60,0.15); color:#E74C3C;">📞</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Missed call</strong> from Jennifer L. (661-555-0455)</div>
+                  <div class="activity-time">1h ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(155,89,182,0.15); color:#9B59B6;">🤖</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>AI</strong> sent follow-up to 6 cold leads</div>
+                  <div class="activity-time">2h ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(46,204,113,0.15); color:#2ECC71;">🎉</div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Closed!</strong> 13627 Foyers Falls Dr — $419,999</div>
+                  <div class="activity-time">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">🏆 Team GCI Leaderboard</span></div>
+            <div class="leaderboard-row">
+              <div class="lb-rank gold">1</div>
+              <div class="avatar" style="width:30px;height:30px;font-size:12px;">AP</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">Andrew Perez</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:100%"></div></div>
+              <div class="lb-gci">$38,500</div>
+            </div>
+            <div class="leaderboard-row">
+              <div class="lb-rank silver">2</div>
+              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#3B5998;color:#fff;">MR</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">Maria Rivera</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:74%"></div></div>
+              <div class="lb-gci">$28,400</div>
+            </div>
+            <div class="leaderboard-row">
+              <div class="lb-rank bronze">3</div>
+              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#2E7D32;color:#fff;">TN</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">Tom Nguyen</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:52%"></div></div>
+              <div class="lb-gci">$19,800</div>
+            </div>
+            <div class="leaderboard-row">
+              <div class="lb-rank" style="color:var(--text-dim);">4</div>
+              <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#6A1B9A;color:#fff;">SC</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">Sarah Chen</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:36%"></div></div>
+              <div class="lb-gci">$13,700</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIPELINE TAB -->
+    <div class="tab-view" id="tab-pipeline">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <div class="quick-chip">📋 24 Total Leads</div>
+        <div class="quick-chip">💰 $4.2M Pipeline Value</div>
+        <div style="margin-left:auto;display:flex;gap:10px;">
+          <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+            <option>All Leads</option><option>My Leads</option><option>Team Leads</option>
+          </select>
+          <button class="btn btn-gold" onclick="openAdd()">+ New Lead</button>
+        </div>
+      </div>
+      <div class="pipeline-grid">
+        <!-- CAPTURE -->
+        <div class="stage-col stage-capture">
+          <div class="stage-header">
+            <span class="stage-name">📥 Capture</span>
+            <span class="stage-count">8 leads</span>
+          </div>
+          <div class="stage-leads">
+            <div class="lead-card">
+              <span class="lead-score score-warm">72</span>
+              <div class="lead-name">Carlos Valenzuela</div>
+              <div class="lead-meta">Facebook Ad · Bakersfield</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-new">NEW</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-cold">45</span>
+              <div class="lead-name">Jennifer Lopez</div>
+              <div class="lead-meta">Google · NW Bakersfield</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-warm">61</span>
+              <div class="lead-name">Roberto Flores</div>
+              <div class="lead-meta">Zillow Import</div>
+              <div class="lead-tags"><span class="tag tag-seller">SELLER</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-cold">38</span>
+              <div class="lead-name">Linda Park</div>
+              <div class="lead-meta">Open House Sign-In</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-cold">COLD</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- IDENTIFY -->
+        <div class="stage-col stage-identify">
+          <div class="stage-header">
+            <span class="stage-name">🔍 Identify</span>
+            <span class="stage-count">7 leads</span>
+          </div>
+          <div class="stage-leads">
+            <div class="lead-card">
+              <span class="lead-score score-warm">74</span>
+              <div class="lead-name">Maria Gutierrez</div>
+              <div class="lead-meta">$350–420K · 3–4 bed</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span><span class="tag tag-warm">WARM</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-warm">68</span>
+              <div class="lead-name">David Kim</div>
+              <div class="lead-meta">Seller · Pool req.</div>
+              <div class="lead-tags"><span class="tag tag-seller">SELLER</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-warm">65</span>
+              <div class="lead-name">Ana & Luis Torres</div>
+              <div class="lead-meta">First-time buyer · FHA</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- NURTURE -->
+        <div class="stage-col stage-nurture">
+          <div class="stage-header">
+            <span class="stage-name">💧 Nurture</span>
+            <span class="stage-count">6 leads</span>
+          </div>
+          <div class="stage-leads">
+            <div class="lead-card">
+              <span class="lead-score score-hot">91</span>
+              <div class="lead-name">Jose & Michelle R.</div>
+              <div class="lead-meta">Final walkthrough ready</div>
+              <div class="lead-tags"><span class="tag tag-hot">HOT</span><span class="tag tag-buyer">BUYER</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-warm">77</span>
+              <div class="lead-name">Brenda Castillo</div>
+              <div class="lead-meta">Listing consult booked</div>
+              <div class="lead-tags"><span class="tag tag-seller">SELLER</span><span class="tag tag-warm">WARM</span></div>
+            </div>
+            <div class="lead-card">
+              <span class="lead-score score-warm">69</span>
+              <div class="lead-name">Mike Sullivan</div>
+              <div class="lead-meta">Pre-approval pending</div>
+              <div class="lead-tags"><span class="tag tag-buyer">BUYER</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- CONVERT -->
+        <div class="stage-col stage-convert">
+          <div class="stage-header">
+            <span class="stage-name">✅ Convert</span>
+            <span class="stage-count">3 leads</span>
+          </div>
+          <div class="stage-leads">
+            <div class="lead-card" style="border-color: rgba(46,204,113,0.3);">
+              <span class="lead-score score-hot">97</span>
+              <div class="lead-name">Jacob Perez</div>
+              <div class="lead-meta">Under contract · $419,999</div>
+              <div class="lead-tags"><span class="tag tag-hot">CLOSING</span></div>
+            </div>
+            <div class="lead-card" style="border-color: rgba(46,204,113,0.3);">
+              <span class="lead-score score-hot">93</span>
+              <div class="lead-name">3707 Panorama Dr</div>
+              <div class="lead-meta">Active listing · Pool</div>
+              <div class="lead-tags"><span class="tag tag-seller">LISTING</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS TAB -->
+    <div class="tab-view" id="tab-contacts">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <div class="search-bar" style="width:320px;">
+          <span>🔍</span>
+          <input type="text" placeholder="Search contacts...">
+        </div>
+        <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+          <option>All Contacts</option><option>Buyers</option><option>Sellers</option><option>Past Clients</option>
+        </select>
+        <select style="font-size:12px;padding:7px 12px;width:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+          <option>All Stages</option><option>Hot</option><option>Warm</option><option>Cold</option>
+        </select>
+        <button class="btn btn-gold" style="margin-left:auto;" onclick="openAdd()">+ Add Contact</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Contact</th><th>Type</th><th>Stage</th><th>Score</th><th>Source</th><th>Last Activity</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="contacts-table">
+              <tr>
+                <td><div class="contact-name">Jacob Perez</div></td>
+                <td><div class="contact-phone">661-555-0142</div><div class="contact-email">jperez@email.com</div></td>
+                <td><span class="tag tag-buyer">BUYER</span></td>
+                <td><span class="tag tag-hot">CONVERT</span></td>
+                <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">97</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Referral</td>
+                <td><span class="activity-dot" style="background:var(--success)"></span>4h ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">Jose & Michelle R.</div></td>
+                <td><div class="contact-phone">661-555-0198</div><div class="contact-email">jmrodriguez@email.com</div></td>
+                <td><span class="tag tag-buyer">BUYER</span></td>
+                <td><span class="tag tag-hot">NURTURE</span></td>
+                <td><span class="score-hot" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">91</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Google Ad</td>
+                <td><span class="activity-dot" style="background:var(--warning)"></span>1d ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">Maria Gutierrez</div></td>
+                <td><div class="contact-phone">661-555-0277</div><div class="contact-email">mgutierrez@email.com</div></td>
+                <td><span class="tag tag-buyer">BUYER</span></td>
+                <td><span class="tag tag-warm">IDENTIFY</span></td>
+                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">74</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Facebook Ad</td>
+                <td><span class="activity-dot" style="background:var(--warning)"></span>2d ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">David Kim</div></td>
+                <td><div class="contact-phone">661-555-0311</div><div class="contact-email">dkim@email.com</div></td>
+                <td><span class="tag tag-seller">SELLER</span></td>
+                <td><span class="tag tag-warm">IDENTIFY</span></td>
+                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">68</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Open House</td>
+                <td><span class="activity-dot" style="background:var(--info)"></span>3d ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">Brenda Castillo</div></td>
+                <td><div class="contact-phone">661-555-0388</div><div class="contact-email">bcastillo@email.com</div></td>
+                <td><span class="tag tag-seller">SELLER</span></td>
+                <td><span class="tag tag-warm">NURTURE</span></td>
+                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">77</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Referral</td>
+                <td><span class="activity-dot" style="background:var(--success)"></span>1d ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">Carlos Valenzuela</div></td>
+                <td><div class="contact-phone">661-555-0421</div><div class="contact-email">cvalenz@email.com</div></td>
+                <td><span class="tag tag-buyer">BUYER</span></td>
+                <td><span class="tag tag-new">CAPTURE</span></td>
+                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">72</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Facebook Ad</td>
+                <td><span class="activity-dot" style="background:var(--success)"></span>Today</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+              <tr>
+                <td><div class="contact-name">Ana & Luis Torres</div></td>
+                <td><div class="contact-phone">661-555-0502</div><div class="contact-email">torres.family@email.com</div></td>
+                <td><span class="tag tag-buyer">BUYER</span></td>
+                <td><span class="tag tag-warm">IDENTIFY</span></td>
+                <td><span class="score-warm" style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;">65</span></td>
+                <td style="color:var(--text-muted);font-size:12px;">Zillow</td>
+                <td><span class="activity-dot" style="background:var(--warning)"></span>2d ago</td>
+                <td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="showComms()">Msg</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMUNICATIONS TAB -->
+    <div class="tab-view" id="tab-comms">
+      <div style="margin-bottom:16px;display:flex;gap:10px;">
+        <button class="btn btn-gold" style="font-size:12px;padding:7px 14px;">📱 SMS</button>
+        <button class="btn btn-outline" style="font-size:12px;padding:7px 14px;">📧 Email</button>
+        <button class="btn btn-outline" style="font-size:12px;padding:7px 14px;">📞 Call Log</button>
+        <button class="btn btn-outline" style="font-size:12px;padding:7px 14px;">🎥 Video Msg</button>
+      </div>
+      <div class="comms-layout">
+        <div class="comms-list">
+          <div class="comms-list-header">
+            <input class="comms-search" placeholder="Search conversations...">
+          </div>
+          <div class="convo-item active">
+            <div class="convo-avatar">JP</div>
+            <div style="flex:1;min-width:0;">
+              <div class="convo-name">Jacob Perez</div>
+              <div class="convo-preview">Sounds good, I'll be there at 10am</div>
+            </div>
+            <div class="convo-time">4h</div>
+          </div>
+          <div class="convo-item">
+            <div class="convo-avatar">JR</div>
+            <div style="flex:1;min-width:0;">
+              <div class="convo-name">Jose Rodriguez</div>
+              <div class="convo-preview">Can we schedule the walkthrough for...</div>
+            </div>
+            <div class="convo-time">1d</div>
+          </div>
+          <div class="convo-item">
+            <div class="convo-avatar">MG</div>
+            <div style="flex:1;min-width:0;">
+              <div class="convo-name">Maria Gutierrez</div>
+              <div class="convo-preview">I saw that home on Panorama, interested!</div>
+            </div>
+            <div class="convo-time">2d</div>
+          </div>
+          <div class="convo-item">
+            <div class="convo-avatar">CV</div>
+            <div style="flex:1;min-width:0;">
+              <div class="convo-name">Carlos Valenzuela</div>
+              <div class="convo-preview">New lead — Facebook inquiry</div>
+            </div>
+            <div class="convo-time" style="color:var(--gold);">NEW</div>
+          </div>
+          <div class="convo-item">
+            <div class="convo-avatar">DK</div>
+            <div style="flex:1;min-width:0;">
+              <div class="convo-name">David Kim</div>
+              <div class="convo-preview">What's the market like for 4-beds?</div>
+            </div>
+            <div class="convo-time">3d</div>
+          </div>
+        </div>
+        <div class="comms-panel">
+          <div class="comms-header">
+            <div class="avatar">JP</div>
+            <div>
+              <div class="comms-header-name">Jacob Perez</div>
+              <div class="comms-header-meta">📱 661-555-0142 · Under Contract · Score: 97</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn btn-outline" style="font-size:11px;padding:5px 10px;">📋 Profile</button>
+              <button class="btn btn-gold" style="font-size:11px;padding:5px 10px;">📞 Call</button>
+            </div>
+          </div>
+          <div class="messages">
+            <div style="text-align:center;font-size:11px;color:var(--text-dim);padding:4px 0;">Today, April 16</div>
+            <div class="msg msg-in">
+              Hey Andrew, quick question on the inspection — the solar panel issue, is that on the seller?
+              <div class="msg-time">8:12 AM</div>
+            </div>
+            <div class="msg msg-out">
+              Hey Jacob! Yes, I've already submitted the repair request. Seller has 3 days to respond. I'll keep you posted 👍
+              <div class="msg-time">8:24 AM</div>
+            </div>
+            <div class="msg msg-in">
+              Perfect. Also — what's the timeline looking like for close? We're trying to plan our move.
+              <div class="msg-time">9:05 AM</div>
+            </div>
+            <div class="msg msg-out">
+              We're on track for April 30. Escrow is moving smooth. Lender just needs your final pay stub — can you text it to them today?
+              <div class="msg-time">9:17 AM</div>
+            </div>
+            <div class="msg msg-in">
+              Sounds good, I'll be there at 10am for the final walkthrough. Super excited!
+              <div class="msg-time">10:44 AM</div>
+            </div>
+          </div>
+          <div style="padding:8px 20px;background:var(--card);border-top:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">💡 AI Script Suggestion: <span style="color:var(--gold);">Confirm walkthrough time and send escrow timeline PDF</span></div>
+          </div>
+          <div class="compose-bar">
+            <textarea class="compose-input" rows="1" placeholder="Type a message... (SMS)"></textarea>
+            <button class="btn btn-outline" style="font-size:11px;align-self:flex-end;">📎</button>
+            <button class="btn btn-gold" style="align-self:flex-end;">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTOTRACKS TAB -->
+    <div class="tab-view" id="tab-automation">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <div style="font-size:13px;color:var(--text-muted);">7 active AutoTracks running · 138 leads enrolled</div>
+        <button class="btn btn-gold" style="margin-left:auto;">+ Create AutoTrack</button>
+      </div>
+      <div class="tracks-grid">
+        <div class="track-card">
+          <div class="track-icon">🔥</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="track-name">New Lead Blitz</div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="track-desc">Immediate response sequence — texts + email within 5 min of new lead capture. Behavior-triggered follow-up for first 72 hours.</div>
+          <div class="track-stats">
+            <div class="track-stat"><strong>24</strong>Enrolled</div>
+            <div class="track-stat"><strong>68%</strong>Open Rate</div>
+            <div class="track-stat"><strong>5 Steps</strong>Sequence</div>
+          </div>
+        </div>
+        <div class="track-card">
+          <div class="track-icon">💧</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="track-name">Long-Term Nurture</div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="track-desc">12-month drip campaign. Monthly market reports, property alerts, and check-in texts for leads not ready to act yet.</div>
+          <div class="track-stats">
+            <div class="track-stat"><strong>92</strong>Enrolled</div>
+            <div class="track-stat"><strong>41%</strong>Open Rate</div>
+            <div class="track-stat"><strong>24 Steps</strong>Sequence</div>
+          </div>
+        </div>
+        <div class="track-card">
+          <div class="track-icon">🏡</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="track-name">Seller Lead Track</div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="track-desc">Home valuation follow-up, CMA delivery, and listing consult booking sequence for potential sellers.</div>
+          <div class="track-stats">
+            <div class="track-stat"><strong>11</strong>Enrolled</div>
+            <div class="track-stat"><strong>55%</strong>Open Rate</div>
+            <div class="track-stat"><strong>8 Steps</strong>Sequence</div>
+          </div>
+        </div>
+        <div class="track-card">
+          <div class="track-icon">📅</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="track-name">Pre-Close Checklist</div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="track-desc">Under-contract milestone reminders. Inspection, appraisal, docs, final walkthrough, and closing day checklist texts.</div>
+          <div class="track-stats">
+            <div class="track-stat"><strong>3</strong>Enrolled</div>
+            <div class="track-stat"><strong>100%</strong>Open Rate</div>
+            <div class="track-stat"><strong>12 Steps</strong>Sequence</div>
+          </div>
+        </div>
+        <div class="track-card">
+          <div class="track-icon">🌟</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="track-name">Past Client Re-Engage</div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="track-desc">Anniversary, birthday, and annual equity check-in sequence to generate referrals and repeat business.</div>
+          <div class="track-stats">
+            <div class="track-stat"><strong>47</strong>Enrolled</div>
+            <div class="track-stat"><strong>62%</strong>Open Rate</div>
+            <div class="track-stat"><strong>10 Steps</strong>Sequence</div>
+          </div>
+        </div>
+        <div class="track-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;">
+          <div style="font-size:36px;margin-bottom:10px;">➕</div>
+          <div class="track-name" style="color:var(--text-muted);">Create New AutoTrack</div>
+          <div class="track-desc" style="margin-top:6px;">Build a custom nurture sequence for any lead type or stage.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT TAB -->
+    <div class="tab-view" id="tab-ai">
+      <div class="ai-layout">
+        <div class="ai-chat">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);">AI</div>
+            <div>
+              <div style="font-weight:700;font-size:14px;">AgentDesk AI</div>
+              <div style="font-size:11px;color:var(--success);">● Active · Monitoring 138 leads</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <span style="font-size:11px;background:rgba(46,204,113,0.15);color:var(--success);padding:3px 9px;border-radius:10px;border:1px solid rgba(46,204,113,0.3);">24/7 ON</span>
+            </div>
+          </div>
+          <div class="ai-messages">
+            <div class="ai-msg">
+              <div class="ai-avatar">AI</div>
+              <div class="ai-bubble">
+                Good morning, Andrew! Here's your daily briefing:<br><br>
+                🔥 <strong>4 hot leads</strong> need attention today — Jacob Perez is highest priority (score 97, under contract).<br>
+                📞 <strong>3 missed calls</strong> in the last 24 hours.<br>
+                🏠 <strong>7 new property alerts</strong> match your buyers' criteria.<br>
+                ⚡ AutoTracks sent <strong>31 messages</strong> overnight — 12 opened.<br><br>
+                What would you like to tackle first?
+              </div>
+            </div>
+            <div class="ai-msg" style="flex-direction:row-reverse;">
+              <div class="ai-avatar user-avatar">AP</div>
+              <div class="ai-bubble user-bubble" style="text-align:right;">
+                Write me a follow-up text for Maria Gutierrez. She's a buyer looking $350-420K, 3-4 bed. Hasn't responded in 2 days.
+              </div>
+            </div>
+            <div class="ai-msg">
+              <div class="ai-avatar">AI</div>
+              <div class="ai-bubble">
+                Here's a follow-up text for Maria:<br><br>
+                <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;font-style:italic;color:var(--text);">
+                  "Hey Maria! I just pulled up a few homes in Bakersfield that match exactly what you're looking for — 3–4 bed, in your budget. Would you want me to send them over? Just reply INFO and I'll shoot them right to you! 😊 — Andrew 661-619-7272"
+                </div>
+                <br>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <button class="btn btn-gold" style="font-size:12px;padding:6px 14px;" onclick="showComms()">📱 Send Now</button>
+                  <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;">✏️ Edit</button>
+                  <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;">🔄 Rewrite</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-compose">
+            <input class="ai-input" type="text" placeholder="Ask AI to write a script, analyze a lead, suggest next steps...">
+            <button class="btn btn-gold">Send ↗</button>
+          </div>
+        </div>
+        <div class="ai-sidebar-panel">
+          <div class="card">
+            <div class="card-header"><span class="card-title">🎯 Smart Suggestions</span></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div class="ai-suggestion">
+                <div class="suggestion-label">📞 Call Script</div>
+                <div class="suggestion-text">Jacob Perez — confirm final walkthrough time and solar repair update</div>
+              </div>
+              <div class="ai-suggestion">
+                <div class="suggestion-label">💬 Re-Engage</div>
+                <div class="suggestion-text">3 leads haven't responded in 5+ days — send re-engagement text campaign</div>
+              </div>
+              <div class="ai-suggestion">
+                <div class="suggestion-label">🏠 Property Match</div>
+                <div class="suggestion-text">New listing on Gosford Rd matches Maria G.'s criteria — send alert now</div>
+              </div>
+              <div class="ai-suggestion">
+                <div class="suggestion-label">📊 Market Report</div>
+                <div class="suggestion-text">NW Bakersfield Q1 report ready — send to 14 leads in that submarket</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📈 AI Performance</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center;">
+                <div style="font-family:'Barlow Condensed';font-size:28px;font-weight:700;color:var(--gold);">31</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Msgs Sent Today</div>
+              </div>
+              <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center;">
+                <div style="font-family:'Barlow Condensed';font-size:28px;font-weight:700;color:var(--success);">12</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Responses</div>
+              </div>
+              <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center;">
+                <div style="font-family:'Barlow Condensed';font-size:28px;font-weight:700;color:var(--info);">4</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Leads Escalated</div>
+              </div>
+              <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center;">
+                <div style="font-family:'Barlow Condensed';font-size:28px;font-weight:700;color:var(--warning);">38%</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Response Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM TAB -->
+    <div class="tab-view" id="tab-team">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <div style="font-size:13px;color:var(--text-muted);">4 Agents · Open Door Real Estate — Kern County</div>
+        <button class="btn btn-gold" style="margin-left:auto;">+ Add Agent</button>
+      </div>
+      <div class="team-grid">
+        <div class="agent-card">
+          <div class="agent-big-avatar">AP</div>
+          <div class="agent-card-name">Andrew Perez</div>
+          <div class="agent-card-role">Lead Agent · DRE #01965640</div>
+          <div class="agent-stats">
+            <div class="agent-stat-item"><div class="agent-stat-val">38</div><div class="agent-stat-lbl">Active Leads</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">3</div><div class="agent-stat-lbl">Closings</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">97%</div><div class="agent-stat-lbl">Response</div></div>
+          </div>
+          <span class="status-badge status-online"><span class="status-dot"></span>Online</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-big-avatar" style="background:linear-gradient(135deg,#1a4a6a,#3498DB);">MR</div>
+          <div class="agent-card-name">Maria Rivera</div>
+          <div class="agent-card-role">Agent · DRE #02145892</div>
+          <div class="agent-stats">
+            <div class="agent-stat-item"><div class="agent-stat-val">24</div><div class="agent-stat-lbl">Active Leads</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">2</div><div class="agent-stat-lbl">Closings</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">88%</div><div class="agent-stat-lbl">Response</div></div>
+          </div>
+          <span class="status-badge status-online"><span class="status-dot"></span>Online</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-big-avatar" style="background:linear-gradient(135deg,#1a5a2a,#2ECC71);">TN</div>
+          <div class="agent-card-name">Tom Nguyen</div>
+          <div class="agent-card-role">Agent · DRE #02267441</div>
+          <div class="agent-stats">
+            <div class="agent-stat-item"><div class="agent-stat-val">18</div><div class="agent-stat-lbl">Active Leads</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">1</div><div class="agent-stat-lbl">Closings</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">79%</div><div class="agent-stat-lbl">Response</div></div>
+          </div>
+          <span class="status-badge status-offline"><span class="status-dot"></span>Offline</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-big-avatar" style="background:linear-gradient(135deg,#5a1a4a,#9B59B6);">SC</div>
+          <div class="agent-card-name">Sarah Chen</div>
+          <div class="agent-card-role">Agent · DRE #02389012</div>
+          <div class="agent-stats">
+            <div class="agent-stat-item"><div class="agent-stat-val">14</div><div class="agent-stat-lbl">Active Leads</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">1</div><div class="agent-stat-lbl">Closings</div></div>
+            <div class="agent-stat-item"><div class="agent-stat-val">82%</div><div class="agent-stat-lbl">Response</div></div>
+          </div>
+          <span class="status-badge status-online"><span class="status-dot"></span>Online</span>
+        </div>
+      </div>
+
+      <!-- LEAD ROUTING -->
+      <div style="margin-top:20px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔀 Lead Routing Rules</span><button class="btn btn-outline" style="font-size:11px;padding:5px 12px;">Edit Rules</button></div>
+          <table>
+            <thead><tr><th>Rule</th><th>Source</th><th>Assign To</th><th>Priority</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Spanish-speaking leads</td>
+                <td style="color:var(--text-muted);">All Sources</td>
+                <td><span class="tag tag-buyer">Andrew Perez</span></td>
+                <td>High</td>
+                <td><span style="color:var(--success);">● Active</span></td>
+              </tr>
+              <tr>
+                <td>NW Bakersfield buyers</td>
+                <td style="color:var(--text-muted);">Google / Facebook</td>
+                <td><span class="tag tag-cold">Maria Rivera</span></td>
+                <td>Medium</td>
+                <td><span style="color:var(--success);">● Active</span></td>
+              </tr>
+              <tr>
+                <td>Round robin — all new leads</td>
+                <td style="color:var(--text-muted);">Zillow Import</td>
+                <td><span class="tag tag-warm">Round Robin</span></td>
+                <td>Low</td>
+                <td><span style="color:var(--success);">● Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPERTY ALERTS / IDX TAB -->
+    <div class="tab-view" id="tab-idx">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <div style="font-size:13px;color:var(--text-muted);">7 new matches · Bakersfield, CA</div>
+        <div class="quick-chip">💰 $300K–$500K</div>
+        <div class="quick-chip">🛏 3–4 Bed</div>
+        <div class="quick-chip">📍 NW Bakersfield</div>
+        <button class="btn btn-gold" style="margin-left:auto;">+ New Alert</button>
+      </div>
+      <div class="alerts-grid">
+        <div class="prop-card">
+          <div class="prop-img">🏡<span class="prop-badge badge-hot">HOT MATCH</span></div>
+          <div class="prop-info">
+            <div class="prop-price">$387,500</div>
+            <div class="prop-address">4821 Gosford Rd, Bakersfield, CA</div>
+            <div class="prop-details"><span>🛏 3 bed</span><span>🚿 2 bath</span><span>📐 1,840 sqft</span></div>
+            <div class="prop-lead">Matches: <strong>Maria G.</strong>, <strong>Ana Torres</strong></div>
+          </div>
+        </div>
+        <div class="prop-card">
+          <div class="prop-img">🏘<span class="prop-badge badge-new">NEW LISTING</span></div>
+          <div class="prop-info">
+            <div class="prop-price">$419,999</div>
+            <div class="prop-address">13627 Foyers Falls Dr, Bakersfield</div>
+            <div class="prop-details"><span>🛏 3 bed</span><span>🚿 2 bath</span><span>☀️ Solar</span></div>
+            <div class="prop-lead">Status: <strong>Under Contract</strong> — Jacob P.</div>
+          </div>
+        </div>
+        <div class="prop-card">
+          <div class="prop-img">🏠<span class="prop-badge badge-pricedrop">PRICE DROP</span></div>
+          <div class="prop-info">
+            <div class="prop-price">$349,000</div>
+            <div class="prop-address">2214 Oak Creek Dr, Bakersfield</div>
+            <div class="prop-details"><span>🛏 3 bed</span><span>🚿 2 bath</span><span>📐 1,620 sqft</span></div>
+            <div class="prop-lead">Matches: <strong>Carlos V.</strong></div>
+          </div>
+        </div>
+        <div class="prop-card">
+          <div class="prop-img">🏡</div>
+          <div class="prop-info">
+            <div class="prop-price">$457,500</div>
+            <div class="prop-address">7105 Aztec Way, Bakersfield</div>
+            <div class="prop-details"><span>🛏 3 bed</span><span>🚿 2 bath</span><span>📐 2,099 sqft</span></div>
+            <div class="prop-lead">Status: <strong>Active Listing</strong> — Your Listing</div>
+          </div>
+        </div>
+        <div class="prop-card">
+          <div class="prop-img">🏘</div>
+          <div class="prop-info">
+            <div class="prop-price">$435,000</div>
+            <div class="prop-address">3707 Panorama Dr, Bakersfield</div>
+            <div class="prop-details"><span>🛏 4 bed</span><span>🏊 Pool</span><span>📐 2,400 sqft</span></div>
+            <div class="prop-lead">Status: <strong>Your Listing</strong> — Active</div>
+          </div>
+        </div>
+        <div class="prop-card">
+          <div class="prop-img">🏠<span class="prop-badge badge-new">NEW</span></div>
+          <div class="prop-info">
+            <div class="prop-price">$398,000</div>
+            <div class="prop-address">1890 Ming Ave, Bakersfield</div>
+            <div class="prop-details"><span>🛏 4 bed</span><span>🚿 2 bath</span><span>📐 1,980 sqft</span></div>
+            <div class="prop-lead">Matches: <strong>David K.</strong>, <strong>Jose R.</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS TAB -->
+    <div class="tab-view" id="tab-reports">
+      <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+        <button class="btn btn-gold" style="font-size:12px;">📊 This Month</button>
+        <button class="btn btn-outline" style="font-size:12px;">This Quarter</button>
+        <button class="btn btn-outline" style="font-size:12px;">YTD</button>
+        <button class="btn btn-outline" style="margin-left:auto;font-size:12px;">⬇️ Export PDF</button>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-label">GCI This Month</div>
+          <div class="stat-value">$38,500</div>
+          <div class="stat-sub"><span>↑ 22%</span> vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Leads Generated</div>
+          <div class="stat-value">88</div>
+          <div class="stat-sub"><span>↑ 14</span> new this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Conversion Rate</div>
+          <div class="stat-value">30%</div>
+          <div class="stat-sub"><span>↑ 4%</span> vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cost Per Lead</div>
+          <div class="stat-value">$24</div>
+          <div class="stat-sub">Google: $31 · FB: $18</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Lead Sources</span></div>
+          <table>
+            <thead><tr><th>Source</th><th>Leads</th><th>Conv.</th><th>GCI</th></tr></thead>
+            <tbody>
+              <tr><td>Referral</td><td>18</td><td><span style="color:var(--success);">44%</span></td><td style="color:var(--gold);">$21,200</td></tr>
+              <tr><td>Google Ads</td><td>31</td><td><span style="color:var(--warning);">28%</span></td><td style="color:var(--gold);">$10,800</td></tr>
+              <tr><td>Facebook Ads</td><td>22</td><td><span style="color:var(--warning);">24%</span></td><td style="color:var(--gold);">$4,900</td></tr>
+              <tr><td>Zillow</td><td>11</td><td><span style="color:var(--info);">18%</span></td><td style="color:var(--gold);">$1,600</td></tr>
+              <tr><td>Open House</td><td>6</td><td><span style="color:var(--success);">33%</span></td><td style="color:var(--gold);">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Monthly GCI Trend</span></div>
+          <div style="padding:8px 0;">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 8px;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="font-size:10px;color:var(--text-dim);">$28k</div>
+                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:68%;min-height:8px;"></div>
+                <div style="font-size:10px;color:var(--text-dim);">Jan</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="font-size:10px;color:var(--text-dim);">$19k</div>
+                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:46%;min-height:8px;"></div>
+                <div style="font-size:10px;color:var(--text-dim);">Feb</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="font-size:10px;color:var(--text-dim);">$31k</div>
+                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold-dim),var(--gold));border-radius:4px 4px 0 0;height:76%;min-height:8px;"></div>
+                <div style="font-size:10px;color:var(--text-dim);">Mar</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="font-size:10px;color:var(--accent);font-weight:700;">$38.5k</div>
+                <div style="flex:1;width:100%;background:linear-gradient(0deg,var(--gold),var(--accent));border-radius:4px 4px 0 0;height:93%;min-height:8px;border:1px solid var(--accent);"></div>
+                <div style="font-size:10px;color:var(--gold);font-weight:700;">Apr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+    <!-- PLANS & FEATURES TAB -->
+    <div class="tab-view" id="tab-plans">
+
+      <!-- PLAN SELECTOR HEADER -->
+      <div class="plans-header">
+        <div class="plans-intro">
+          <div class="plans-label">SOLUTIONS</div>
+          <div class="plans-title">Compare Plans</div>
+          <div class="plans-sub">Find the AgentDesk solution that fits your business.</div>
+        </div>
+        <div class="plans-cols">
+          <div class="plan-col">
+            <div class="plan-name">SOLO</div>
+            <div class="plan-users">1 User</div>
+            <button class="btn btn-outline plan-btn">Request Pricing</button>
+          </div>
+          <div class="plan-col">
+            <div class="plan-name">RAMP</div>
+            <div class="plan-users">Up to 4 Users</div>
+            <button class="btn btn-outline plan-btn">Request Pricing</button>
+          </div>
+          <div class="plan-col featured">
+            <div class="plan-badge">MOST POPULAR</div>
+            <div class="plan-name" style="color:var(--gold);">PRO</div>
+            <div class="plan-users">Up to 49 Users</div>
+            <button class="btn btn-gold plan-btn">Request Pricing</button>
+          </div>
+          <div class="plan-col">
+            <div class="plan-name">SELECT</div>
+            <div class="plan-users">50+ Users</div>
+            <button class="btn btn-outline plan-btn">Request Pricing</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE SECTIONS -->
+      <div class="feat-section">
+        <div class="feat-section-header" onclick="toggleSection(this)">
+          <span class="feat-section-title">Core Features</span>
+          <span class="feat-chevron">▾</span>
+        </div>
+        <div class="feat-rows">
+          <div class="feat-header-row">
+            <div class="feat-name"></div>
+            <div class="feat-cell feat-col-label">SOLO</div>
+            <div class="feat-cell feat-col-label">RAMP</div>
+            <div class="feat-cell feat-col-label featured-col">PRO</div>
+            <div class="feat-cell feat-col-label">SELECT</div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">CRM</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">AutoTracks</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Mobile Apps</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Landing Pages</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Seller Suite</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">AI Assistant</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Custom Labels</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Mass Messaging</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Database Imports</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Video Messaging</div>
+            <div class="feat-cell feat-text">Basic</div>
+            <div class="feat-cell feat-text">Basic</div>
+            <div class="feat-cell feat-text featured-col" style="color:var(--gold);">Advanced</div>
+            <div class="feat-cell feat-text" style="color:var(--gold);">Advanced</div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Lead Routing</div>
+            <div class="feat-cell feat-text">Basic</div>
+            <div class="feat-cell feat-text">Advanced</div>
+            <div class="feat-cell feat-text featured-col" style="color:var(--gold);">Advanced</div>
+            <div class="feat-cell feat-text" style="color:var(--gold);">Advanced</div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">System Integrations</div>
+            <div class="feat-cell feat-text" style="font-size:11px;line-height:1.6;">CRM Connect<br>Google</div>
+            <div class="feat-cell feat-text" style="font-size:11px;line-height:1.6;">CRM Connect<br>Google<br>Zapier<br>MOJO<br>BombBomb</div>
+            <div class="feat-cell feat-text featured-col" style="font-size:11px;line-height:1.6;color:var(--gold);">CRM Connect<br>Google<br>Zapier<br>MOJO<br>BombBomb<br>+ More</div>
+            <div class="feat-cell feat-text" style="font-size:11px;line-height:1.6;color:var(--gold);">CRM Connect<br>Google<br>Zapier<br>MOJO<br>BombBomb<br>+ More</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-section">
+        <div class="feat-section-header" onclick="toggleSection(this)">
+          <span class="feat-section-title">Lead Generation Products</span>
+          <span class="feat-chevron">▾</span>
+        </div>
+        <div class="feat-rows">
+          <div class="feat-row">
+            <div class="feat-name">Google Buyer Leads</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Google Seller Leads</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Facebook Buyer Leads</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Facebook Seller Leads</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">List Cast</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Remarketing</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Cash Offer</div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-section">
+        <div class="feat-section-header" onclick="toggleSection(this)">
+          <span class="feat-section-title">Add-On Offers</span>
+          <span class="feat-chevron">▾</span>
+        </div>
+        <div class="feat-rows">
+          <div class="feat-row">
+            <div class="feat-name">AI Assistant (24/7 Texting)</div>
+            <div class="feat-cell feat-text">Starting at $200/mo</div>
+            <div class="feat-cell feat-text">Starting at $200/mo</div>
+            <div class="feat-cell feat-text featured-col" style="color:var(--gold);">Starting at $200/mo</div>
+            <div class="feat-cell feat-text">Starting at $200/mo</div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Dialer</div>
+            <div class="feat-cell feat-text">3 lines · $75/mo</div>
+            <div class="feat-cell feat-text">3 lines · $75/mo</div>
+            <div class="feat-cell feat-text featured-col" style="color:var(--gold);">3 lines · $75/mo</div>
+            <div class="feat-cell feat-text">3 lines · $75/mo</div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">IDX Consumer Website</div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">PROLINC Referral Network</div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Team Management Tools</div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Multi-Location Support</div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell featured-col"></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+          <div class="feat-row">
+            <div class="feat-name">Dedicated Account Manager</div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell"></div>
+            <div class="feat-cell featured-col"><span class="check">✓</span></div>
+            <div class="feat-cell"><span class="check">✓</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-plans -->
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">+ Add New Lead</div>
+    <div class="form-grid">
+      <div class="form-group"><label>First Name</label><input type="text" placeholder="First name"></div>
+      <div class="form-group"><label>Last Name</label><input type="text" placeholder="Last name"></div>
+      <div class="form-group"><label>Phone</label><input type="tel" placeholder="661-555-0000"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com"></div>
+      <div class="form-group"><label>Lead Type</label>
+        <select>
+          <option>Buyer</option><option>Seller</option><option>Both</option><option>Renter</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Pipeline Stage</label>
+        <select>
+          <option>Capture</option><option>Identify</option><option>Nurture</option><option>Convert</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Lead Source</label>
+        <select>
+          <option>Referral</option><option>Google Ad</option><option>Facebook Ad</option><option>Zillow</option><option>Open House</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Temperature</label>
+        <select>
+          <option>Hot</option><option>Warm</option><option>Cold</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Budget / Notes</label>
+        <textarea placeholder="e.g. Looking $350–420K, 3-4 bed, NW Bakersfield, pre-approved at Chase..."></textarea>
+      </div>
+      <div class="form-group full"><label>Assign To</label>
+        <select>
+          <option>Andrew Perez</option><option>Maria Rivera</option><option>Tom Nguyen</option><option>Sarah Chen</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="closeModal()">Save Lead →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// -- SUPABASE ----------------------------------------------
+const SURL = 'https://ixzeavvrtrnuccldgovz.supabase.co';
+const SKEY = 'sb_publishable_nHFhJwBYJs8niE44h0m1iQ_ePW9uDiU';
+const db = supabase.createClient(SURL, SKEY);
+
+let CU = null, CP = null, contacts = [], profiles = [], activeConvo = null;
+
+// -- BOOT --------------------------------------------------
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) await boot(session.user);
+  else showLogin();
+  document.getElementById('login-password')?.addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+  document.getElementById('login-email')?.addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+});
+
+function showLogin() {
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('app').classList.remove('active');
+}
+
+async function boot(user) {
+  CU = user;
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  const { data: p } = await db.from('profiles').select('*').eq('id', user.id).single();
+  CP = p;
+  if (p) {
+    document.getElementById('sb-name').textContent = p.full_name || p.email;
+    document.getElementById('sb-role').textContent = (p.role === 'admin' ? 'Admin' : 'Agent') + (p.dre_number ? ' - DRE #' + p.dre_number : '');
+    document.getElementById('sb-avatar').textContent = p.avatar_initials || p.full_name?.charAt(0) || '?';
+  }
+  await loadAll();
+}
+
+async function loadAll() {
+  await loadProfiles();
+  await loadDash();
+  await loadPipeline();
+  await loadContacts();
+  await loadConvos();
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  if (!email || !pw) { document.getElementById('login-error').textContent = 'Enter email and password.'; return; }
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
+  if (error) { document.getElementById('login-error').textContent = error.message; return; }
+  await boot(data.user);
+}
+
+async function handleLogout() {
+  await db.auth.signOut();
+  CU = null; CP = null;
+  showLogin();
+}
+
+// -- PROFILES ----------------------------------------------
+async function loadProfiles() {
+  const { data } = await db.from('profiles').select('*').eq('is_active', true).order('full_name');
+  profiles = data || [];
+  const sel = document.getElementById('f-assign');
+  if (sel) sel.innerHTML = profiles.map(p => `<option value="${p.id}">${p.full_name}</option>`).join('');
+  const pf = document.getElementById('pipeline-filter-agent');
+  if (pf) pf.innerHTML = '<option value="">All Agents</option>' + profiles.map(p => `<option value="${p.id}">${p.full_name}</option>`).join('');
+  document.getElementById('stat-team').textContent = profiles.length;
+}
+
+// -- DASHBOARD ---------------------------------------------
+async function loadDash() {
+  const { data: c } = await db.from('contacts').select('*').eq('is_active', true);
+  contacts = c || [];
+  const hot = contacts.filter(x => x.temperature === 'hot');
+  const warm = contacts.filter(x => x.temperature === 'warm');
+  const cold = contacts.filter(x => x.temperature === 'cold');
+  const conv = contacts.filter(x => x.pipeline_stage === 'convert');
+  document.getElementById('stat-leads').textContent = contacts.length;
+  document.getElementById('stat-hot').textContent = hot.length;
+  document.getElementById('stat-convert').textContent = conv.length;
+  document.getElementById('chip-hot').textContent = hot.length;
+  document.getElementById('chip-warm').textContent = warm.length;
+  document.getElementById('chip-cold').textContent = cold.length;
+  document.getElementById('badge-pipeline').textContent = contacts.length;
+  // Priority table
+  const pri = [...contacts].sort((a,b)=>(b.lead_score||0)-(a.lead_score||0)).filter(x=>x.temperature==='hot'||x.lead_score>=60).slice(0,5);
+  const ptEl = document.getElementById('priority-leads-table');
+  if (!ptEl) return;
+  if (pri.length === 0) {
+    ptEl.innerHTML = '<div style="padding:24px;text-align:center;color:#9AAABB;font-size:13px;">No priority leads yet -- add your first contact to get started!</div>';
+  } else {
+    ptEl.innerHTML = `<table><thead><tr><th>Name</th><th>Type</th><th>Score</th><th>Stage</th><th>Source</th><th>Actions</th></tr></thead><tbody>${
+      pri.map(c => `<tr>
+        <td><div style="font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:11px;color:#5A6A82">${c.phone||''}</div></td>
+        <td>${typeBadge(c.contact_type)}</td>
+        <td><span style="font-family:'Barlow Condensed';font-size:20px;font-weight:700;color:${c.temperature==='hot'?'#D03535':c.temperature==='warm'?'#D4850A':'#1A6FBF'}">${c.lead_score||0}</span></td>
+        <td>${stageBadge(c.pipeline_stage)}</td>
+        <td style="font-size:12px;color:#5A6A82">${srcLabel(c.lead_source)}</td>
+        <td><button onclick="editContact('${c.id}')" style="padding:4px 10px;background:linear-gradient(135deg,#B8860B,#D4A017);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">View</button></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+  // Funnel
+  const stages = ['capture','identify','nurture','convert'];
+  const colors = {capture:'#1A6FBF',identify:'#7B3FA0',nurture:'#D4850A',convert:'#1A9E5C'};
+  const counts = {};
+  stages.forEach(s => counts[s] = contacts.filter(x=>x.pipeline_stage===s).length);
+  const mx = Math.max(...Object.values(counts), 1);
+  const fEl = document.getElementById('funnel-chart');
+  if (fEl) fEl.innerHTML = stages.map(s=>`
+    <div style="text-align:center">
+      <div style="font-family:'Barlow Condensed';font-size:13px;font-weight:700;color:${colors[s]};margin-bottom:4px">${counts[s]}</div>
+      <div style="display:flex;align-items:flex-end;justify-content:center;height:90px;padding:6px 0">
+        <div style="flex:1;max-width:40px;border-radius:4px 4px 0 0;background:${colors[s]};opacity:.8;height:${Math.max(8,Math.round(counts[s]/mx*100))}%"></div>
+      </div>
+      <div style="font-size:10px;color:#9AAABB;text-transform:uppercase;letter-spacing:.5px">${s}</div>
+    </div>`).join('');
+  // Activity feed
+  const { data: acts } = await db.from('activities').select('*,contacts(first_name,last_name)').order('occurred_at',{ascending:false}).limit(8);
+  const icons = {call:'call',missed_call:'call',sms:'sms',email:'email',note:'note',stage_change:'change',lead_created:'star',showing:'house',offer:'doc',close:'close',ghl_sync:'sync'};
+  const bgc = {call:'rgba(26,111,191,.1)',missed_call:'rgba(208,53,53,.1)',sms:'rgba(184,134,11,.1)',email:'rgba(26,158,92,.1)',note:'rgba(90,90,90,.08)',stage_change:'rgba(123,63,160,.1)',lead_created:'rgba(184,134,11,.12)',close:'rgba(26,158,92,.12)'};
+  const aEl = document.getElementById('activity-feed');
+  if (aEl) {
+    if (!acts||acts.length===0) {
+      aEl.innerHTML = '<div style="padding:20px;text-align:center;color:#9AAABB;font-size:12px">Activity will appear here as you work leads</div>';
+    } else {
+      aEl.innerHTML = acts.map(a=>`
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(11,22,40,.06)">
+          <div style="width:30px;height:30px;border-radius:50%;background:${bgc[a.activity_type]||'rgba(90,90,90,.07)'};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${icons[a.activity_type]||'.'}</div>
+          <div><div style="font-size:13px">${a.title||(a.contacts?`<strong>${a.contacts.first_name} ${a.contacts.last_name}</strong> -- ${a.activity_type.replace('_',' ')}`:a.activity_type)}</div><div style="font-size:10px;color:#9AAABB;margin-top:2px">${ago(a.occurred_at)}</div></div>
+        </div>`).join('');
+    }
+  }
+  // Leaderboard
+  const lEl = document.getElementById('leaderboard');
+  if (lEl && profiles.length > 0) {
+    const cnt = {};
+    contacts.forEach(c=>{ if(c.assigned_to) cnt[c.assigned_to]=(cnt[c.assigned_to]||0)+1; });
+    const sorted = profiles.map(p=>({...p,n:cnt[p.id]||0})).sort((a,b)=>b.n-a.n);
+    const mx2 = Math.max(...sorted.map(p=>p.n),1);
+    const rc = ['#B8860B','#888','#CD7F32'];
+    lEl.innerHTML = sorted.map((p,i)=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid rgba(11,22,40,.06)">
+        <div style="font-family:'Barlow Condensed';font-size:19px;font-weight:700;width:26px;text-align:center;color:${rc[i]||'#9AAABB'}">${i+1}</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8A6810,#B8860B);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff">${p.avatar_initials||'?'}</div>
+        <div style="flex:1;font-size:13px;font-weight:600">${p.full_name}</div>
+        <div style="flex:2;background:#F4F6FA;border:1px solid rgba(11,22,40,.1);border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#8A6810,#B8860B);width:${Math.round(p.n/mx2*100)}%"></div></div>
+        <div style="font-family:'Barlow Condensed';font-size:15px;font-weight:700;color:#B8860B;min-width:60px;text-align:right">${p.n} leads</div>
+      </div>`).join('');
+  } else if (lEl) {
+    lEl.innerHTML = '<div style="padding:20px;text-align:center;color:#9AAABB;font-size:12px">No team members yet</div>';
+  }
+}
+
+// -- PIPELINE ----------------------------------------------
+async function loadPipeline() {
+  const af = document.getElementById('pipeline-filter-agent')?.value;
+  let q = db.from('contacts').select('*').eq('is_active',true).in('pipeline_stage',['capture','identify','nurture','convert']);
+  if (af) q = q.eq('assigned_to', af);
+  const { data: c } = await q.order('lead_score',{ascending:false});
+  const all = c || [];
+  let total = 0;
+  ['capture','identify','nurture','convert'].forEach(stage => {
+    const sc = all.filter(x=>x.pipeline_stage===stage);
+    total += sc.length;
+    const cnt = document.getElementById('count-' + stage);
+    const el = document.getElementById('stage-' + stage);
+    if (cnt) cnt.textContent = sc.length;
+    if (!el) return;
+    el.innerHTML = sc.length === 0
+      ? '<div style="text-align:center;padding:18px 8px;color:#9AAABB;font-size:11px">No leads in this stage</div>'
+      : sc.map(c=>`
+        <div onclick="editContact('${c.id}')" style="background:#F8F9FC;border:1px solid rgba(11,22,40,.1);border-radius:7px;padding:9px 11px;cursor:pointer;transition:all .13s" onmouseover="this.style.borderColor='#B8860B'" onmouseout="this.style.borderColor='rgba(11,22,40,.1)'">
+          <span style="float:right;font-family:'Barlow Condensed';font-size:17px;font-weight:700;color:${c.temperature==='hot'?'#D03535':c.temperature==='warm'?'#D4850A':'#1A6FBF'}">${c.lead_score||0}</span>
+          <div style="font-weight:600;font-size:13px">${c.first_name} ${c.last_name}</div>
+          <div style="font-size:11px;color:#5A6A82;margin-top:2px">${srcLabel(c.lead_source)}${c.phone?' - '+c.phone:''}</div>
+          <div style="display:flex;gap:3px;margin-top:5px">${typeBadge(c.contact_type)} ${tempBadge(c.temperature)}</div>
+        </div>`).join('');
+  });
+  const pt = document.getElementById('pipeline-total');
+  if (pt) pt.textContent = total;
+}
+
+// -- CONTACTS ----------------------------------------------
+async function loadContacts() {
+  const { data } = await db.from('contacts').select('*,profiles!contacts_assigned_to_fkey(full_name)').eq('is_active',true).order('created_at',{ascending:false});
+  contacts = data || [];
+  renderContacts(contacts);
+}
+
+function renderContacts(list) {
+  const el = document.getElementById('contacts-table-wrap');
+  if (!el) return;
+  if (list.length === 0) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:#9AAABB;font-size:13px">No contacts yet -- add your first lead!</div>';
+    return;
+  }
+  el.innerHTML = `<div style="overflow-x:auto"><table>
+    <thead><tr><th>Name</th><th>Contact</th><th>Type</th><th>Stage</th><th>Score</th><th>Source</th><th>Assigned</th><th>GHL</th><th></th></tr></thead>
+    <tbody>${list.map(c=>`<tr>
+      <td><div style="font-weight:600">${c.first_name} ${c.last_name}</div></td>
+      <td><div style="color:#5A6A82;font-size:12px">${c.phone||'--'}</div><div style="color:#1A6FBF;font-size:11px">${c.email||''}</div></td>
+      <td>${typeBadge(c.contact_type)}</td>
+      <td>${stageBadge(c.pipeline_stage)}</td>
+      <td><span style="font-family:'Barlow Condensed';font-size:19px;font-weight:700;color:${c.temperature==='hot'?'#D03535':c.temperature==='warm'?'#D4850A':'#1A6FBF'}">${c.lead_score||0}</span></td>
+      <td style="font-size:12px;color:#5A6A82">${srcLabel(c.lead_source)}</td>
+      <td style="font-size:12px;color:#5A6A82">${c.profiles?.full_name||'--'}</td>
+      <td>${c.ghl_contact_id?'<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;background:rgba(26,158,92,.1);color:#1A9E5C">Synced</span>':'<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;background:#F4F6FA;color:#9AAABB;border:1px solid rgba(11,22,40,.08)">Not synced</span>'}</td>
+      <td><button onclick="editContact('${c.id}')" style="padding:4px 9px;background:transparent;border:1px solid rgba(11,22,40,.1);border-radius:6px;font-size:11px;cursor:pointer;color:#5A6A82">Edit</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function filterC(v) {
+  const s = (v||document.getElementById('global-search')?.value||'').toLowerCase();
+  const ty = document.getElementById('filter-type')?.value||'';
+  const st = document.getElementById('filter-stage')?.value||'';
+  const te = document.getElementById('filter-temp')?.value||'';
+  renderContacts(contacts.filter(c=>{
+    const nm = `${c.first_name} ${c.last_name} ${c.phone||''} ${c.email||''}`.toLowerCase();
+    return (!s||nm.includes(s))&&(!ty||c.contact_type===ty)&&(!st||c.pipeline_stage===st)&&(!te||c.temperature===te);
+  }));
+}
+
+// -- SAVE / UPDATE CONTACT ---------------------------------
+async function saveContact() {
+  const fn = document.getElementById('f-first').value.trim();
+  const ln = document.getElementById('f-last').value.trim();
+  if (!fn||!ln) { toast('First and last name required','err'); return; }
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  const payload = {
+    first_name:fn, last_name:ln,
+    phone:document.getElementById('f-phone').value.trim()||null,
+    email:document.getElementById('f-email').value.trim()||null,
+    contact_type:document.getElementById('f-type').value,
+    pipeline_stage:document.getElementById('f-stage').value,
+    temperature:document.getElementById('f-temp').value,
+    lead_source:document.getElementById('f-source').value,
+    lead_score:parseInt(document.getElementById('f-score').value)||50,
+    budget_min:parseInt(document.getElementById('f-bmin').value)||null,
+    budget_max:parseInt(document.getElementById('f-bmax').value)||null,
+    assigned_to:document.getElementById('f-assign').value||null,
+    notes:document.getElementById('f-notes').value.trim()||null,
+    created_by:CU?.id,
+  };
+  const { data, error } = await db.from('contacts').insert(payload).select().single();
+  btn.textContent = 'Save Lead'; btn.disabled = false;
+  if (error) { toast('Error: '+error.message,'err'); return; }
+  await db.from('activities').insert({contact_id:data.id,agent_id:CU?.id,activity_type:'lead_created',title:`${fn} ${ln} added to pipeline`});
+  toast(`${fn} ${ln} added!`,'ok');
+  closeModal();
+  await loadAll();
+}
+
+async function updateContact(id) {
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  const old = contacts.find(c=>c.id===id);
+  const ns = document.getElementById('f-stage').value;
+  const payload = {
+    first_name:document.getElementById('f-first').value.trim(),
+    last_name:document.getElementById('f-last').value.trim(),
+    phone:document.getElementById('f-phone').value.trim()||null,
+    email:document.getElementById('f-email').value.trim()||null,
+    contact_type:document.getElementById('f-type').value,
+    pipeline_stage:ns,
+    temperature:document.getElementById('f-temp').value,
+    lead_source:document.getElementById('f-source').value,
+    lead_score:parseInt(document.getElementById('f-score').value)||0,
+    budget_min:parseInt(document.getElementById('f-bmin').value)||null,
+    budget_max:parseInt(document.getElementById('f-bmax').value)||null,
+    assigned_to:document.getElementById('f-assign').value||null,
+    notes:document.getElementById('f-notes').value.trim()||null,
+    updated_at:new Date().toISOString(),
+  };
+  const { error } = await db.from('contacts').update(payload).eq('id',id);
+  btn.textContent = 'Update'; btn.disabled = false;
+  if (error) { toast('Error: '+error.message,'err'); return; }
+  if (old&&old.pipeline_stage!==ns) {
+    await db.from('activities').insert({contact_id:id,agent_id:CU?.id,activity_type:'stage_change',from_stage:old.pipeline_stage,to_stage:ns,title:`Stage: ${old.pipeline_stage} -> ${ns}`});
+  }
+  toast('Contact updated!','ok');
+  closeModal();
+  await loadAll();
+}
+
+// -- MODAL -------------------------------------------------
+function openAdd() {
+  document.getElementById('modal-title').textContent = '+ Add New Lead';
+  document.getElementById('save-btn').textContent = 'Save Lead';
+  document.getElementById('save-btn').onclick = saveContact;
+  ['f-first','f-last','f-phone','f-email','f-score','f-bmin','f-bmax','f-notes'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  const defaults = {'f-type':'buyer','f-stage':'capture','f-temp':'warm','f-source':'referral'};
+  Object.entries(defaults).forEach(([id,v])=>{ const el=document.getElementById(id);if(el)el.value=v; });
+  document.getElementById('modal').classList.add('open');
+}
+
+function editContact(id) {
+  const c = contacts.find(x=>x.id===id);
+  if (!c) return;
+  document.getElementById('modal-title').textContent = `Edit -- ${c.first_name} ${c.last_name}`;
+  document.getElementById('save-btn').textContent = 'Update';
+  document.getElementById('save-btn').onclick = ()=>updateContact(id);
+  const map = {'f-first':c.first_name,'f-last':c.last_name,'f-phone':c.phone||'','f-email':c.email||'','f-type':c.contact_type,'f-stage':c.pipeline_stage,'f-temp':c.temperature,'f-source':c.lead_source,'f-score':c.lead_score||0,'f-bmin':c.budget_min||'','f-bmax':c.budget_max||'','f-notes':c.notes||''};
+  Object.entries(map).forEach(([id,v])=>{ const el=document.getElementById(id);if(el)el.value=v; });
+  if (document.getElementById('f-assign')&&c.assigned_to) document.getElementById('f-assign').value=c.assigned_to;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+});
+
+// -- COMMUNICATIONS ----------------------------------------
+async function loadConvos() {
+  const { data: c } = await db.from('contacts').select('id,first_name,last_name,phone,temperature').eq('is_active',true).order('updated_at',{ascending:false}).limit(20);
+  const el = document.getElementById('convo-list');
+  if (!el) return;
+  if (!c||c.length===0) { el.innerHTML='<div style="padding:18px;text-align:center;color:#9AAABB;font-size:12px">No contacts yet</div>'; return; }
+  el.innerHTML = c.map(x=>`
+    <div class="convo-item" data-id="${x.id}" onclick="openConvo('${x.id}','${x.first_name} ${x.last_name}','${x.phone||''}','${x.temperature}',this)">
+      <div style="width:36px;height:36px;border-radius:50%;background:#1C3158;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0">${x.first_name[0]}${x.last_name[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px">${x.first_name} ${x.last_name}</div>
+        <div style="font-size:11px;color:#5A6A82;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${x.phone||'No phone'}</div>
+      </div>
+      <div style="font-size:10px;color:${x.temperature==='hot'?'#D03535':x.temperature==='warm'?'#D4850A':'#9AAABB'}">${x.temperature}</div>
+    </div>`).join('');
+}
+
+async function openConvo(id,name,phone,temp,el) {
+  document.querySelectorAll('.convo-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  activeConvo = id;
+  document.getElementById('chead').innerHTML = `
+    <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#8A6810,#B8860B);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff">${name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+    <div><div style="font-weight:700;font-size:14px">${name}</div><div style="font-size:11px;color:#5A6A82">${phone||'No phone'} - ${temp}</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button onclick="editContact('${id}')" style="padding:5px 10px;background:transparent;border:1px solid rgba(11,22,40,.1);border-radius:6px;font-size:11px;cursor:pointer">Profile</button>
+      <button style="padding:5px 10px;background:linear-gradient(135deg,#B8860B,#D4A017);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">Call</button>
+    </div>`;
+  document.getElementById('ai-script-hint').innerHTML = `AI: <span style="color:#B8860B;cursor:pointer" onclick="fillAI('Write a follow-up text for ${name}')">Write follow-up text for ${name} -></span>`;
+  const { data: msgs } = await db.from('messages').select('*').eq('contact_id',id).order('sent_at',{ascending:true}).limit(50);
+  const thread = document.getElementById('message-thread');
+  if (!msgs||msgs.length===0) {
+    thread.innerHTML = '<div style="text-align:center;padding:30px;color:#9AAABB;font-size:12px">No messages yet -- send the first one!</div>';
+  } else {
+    thread.innerHTML = msgs.map(m=>`
+      <div style="max-width:70%;padding:9px 13px;border-radius:11px;font-size:13px;line-height:1.5;align-self:${m.direction==='outbound'?'flex-end':'flex-start'};background:${m.direction==='outbound'?'#1C3158':'#fff'};color:${m.direction==='outbound'?'#fff':'inherit'};border:1px solid ${m.direction==='outbound'?'transparent':'rgba(11,22,40,.1)'}">
+        ${m.body}<div style="font-size:9px;color:${m.direction==='outbound'?'rgba(255,255,255,.4)':'#9AAABB'};margin-top:3px">${ago(m.sent_at)}</div>
+      </div>`).join('');
+    thread.scrollTop = thread.scrollHeight;
+  }
+}
+
+async function sendMsg() { return sendMessage(); }
+async function sendMessage() {
+  const body = document.getElementById('compose-text').value.trim();
+  if (!body||!activeConvo) return;
+  await db.from('messages').insert({contact_id:activeConvo,agent_id:CU?.id,direction:'outbound',channel:'sms',body,status:'sent'});
+  document.getElementById('compose-text').value = '';
+  const active = document.querySelector('.convo-item.active');
+  if (active) active.click();
+  toast('Message saved','ok');
+}
+
+// -- TEAM --------------------------------------------------
+async function loadTeam() {
+  const { data: p } = await db.from('profiles').select('*').eq('is_active',true);
+  const { data: c } = await db.from('contacts').select('assigned_to').eq('is_active',true);
+  const el = document.getElementById('team-grid');
+  if (!el) return;
+  if (!p||p.length===0) { el.innerHTML='<div style="padding:20px;color:#9AAABB">No team members yet. Invite agents via Supabase -> Authentication -> Invite User.</div>'; return; }
+  const cnt={};
+  (c||[]).forEach(x=>{ if(x.assigned_to) cnt[x.assigned_to]=(cnt[x.assigned_to]||0)+1; });
+  const colors=['#1C3158','#3B5998','#2E7D32','#6A1B9A','#B71C1C','#0277BD'];
+  el.innerHTML = p.map((ag,i)=>`
+    <div style="background:#fff;border:1px solid rgba(11,22,40,.1);border-radius:11px;padding:18px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;margin:0 auto 10px">${ag.avatar_initials||'?'}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700">${ag.full_name}</div>
+      <div style="font-size:11px;color:#5A6A82;margin-bottom:12px">${ag.role==='admin'?'Admin':'Agent'}${ag.dre_number?' - DRE #'+ag.dre_number:''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px">
+        <div style="background:#F8F9FC;border:1px solid rgba(11,22,40,.06);border-radius:7px;padding:7px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#B8860B">${cnt[ag.id]||0}</div><div style="font-size:9px;color:#9AAABB;text-transform:uppercase">Leads</div></div>
+        <div style="background:#F8F9FC;border:1px solid rgba(11,22,40,.06);border-radius:7px;padding:7px"><div style="font-size:12px;font-weight:600;color:#B8860B;margin-top:3px">${ag.role==='admin'?'Admin':'Agent'}</div><div style="font-size:9px;color:#9AAABB;text-transform:uppercase">Role</div></div>
+      </div>
+      <span style="background:rgba(26,158,92,.1);color:#1A9E5C;border:1px solid rgba(26,158,92,.2);font-size:10px;padding:3px 9px;border-radius:18px;font-weight:600">Active</span>
+    </div>`).join('');
+}
+
+// -- REPORTS -----------------------------------------------
+async function loadReports() {
+  const { data: c } = await db.from('contacts').select('*').eq('is_active',true);
+  if (!c) return;
+  document.getElementById('rpt-total').textContent = c.length;
+  document.getElementById('rpt-hot').textContent = c.filter(x=>x.temperature==='hot').length;
+  document.getElementById('rpt-convert').textContent = c.filter(x=>x.pipeline_stage==='convert').length;
+  const b=c.filter(x=>x.contact_type==='buyer').length, s=c.filter(x=>x.contact_type==='seller').length;
+  document.getElementById('rpt-ratio').textContent = b+'/'+s;
+  const src={};
+  c.forEach(x=>{ src[x.lead_source]=(src[x.lead_source]||0)+1; });
+  const sEl=document.getElementById('rpt-sources-table');
+  if (sEl) sEl.innerHTML=`<table><thead><tr><th>Source</th><th>Leads</th></tr></thead><tbody>${Object.entries(src).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<tr><td style="color:#5A6A82">${srcLabel(s)}</td><td><strong style="color:#B8860B">${n}</strong></td></tr>`).join('')}</tbody></table>`;
+  const stages=['capture','identify','nurture','convert'];
+  const sc={};
+  stages.forEach(s=>sc[s]=c.filter(x=>x.pipeline_stage===s).length);
+  const pEl=document.getElementById('rpt-pipeline-chart');
+  if (pEl) pEl.innerHTML=stages.map(s=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(11,22,40,.06)">
+      <div style="width:70px;font-size:11px;color:#5A6A82;text-transform:capitalize">${s}</div>
+      <div style="flex:1;background:#F4F6FA;border-radius:4px;height:9px;overflow:hidden;border:1px solid rgba(11,22,40,.08)"><div style="height:100%;background:#B8860B;width:${Math.round(sc[s]/(c.length||1)*100)}%;border-radius:4px"></div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#B8860B;min-width:22px;text-align:right">${sc[s]}</div>
+    </div>`).join('');
+}
+
+// -- AI ----------------------------------------------------
+async function sendAI() {
+  const inp = document.getElementById('ai-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  const chat = document.getElementById('ai-chat-messages');
+  chat.innerHTML += `<div style="display:flex;gap:9px;align-items:flex-start;flex-direction:row-reverse"><div style="width:30px;height:30px;border-radius:50%;background:#1C3158;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${CP?.avatar_initials||'AP'}</div><div style="background:rgba(184,134,11,.07);border:1px solid rgba(184,134,11,.16);border-radius:9px;border-top-right-radius:2px;padding:9px 13px;font-size:13px;line-height:1.6;flex:1;text-align:right">${msg}</div></div>`;
+  const thinkId = 'think-'+Date.now();
+  chat.innerHTML += `<div id="${thinkId}" style="display:flex;gap:9px;align-items:flex-start"><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B8860B,#D4A017);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">AI</div><div style="background:#F8F9FC;border:1px solid rgba(11,22,40,.1);border-radius:9px;border-top-left-radius:2px;padding:9px 13px;font-size:13px;line-height:1.6;flex:1;color:#9AAABB">Thinking...</div></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are an expert real estate coach and assistant for Andrew Perez, a real estate agent in Bakersfield CA (DRE #01965640, Open Door Real Estate). Help write scripts, follow-up messages, handle objections, and close more deals. Keep responses concise and actionable. For SMS messages, keep under 160 characters.`,
+        messages:[{role:'user',content:msg}]
+      })
+    });
+    const d = await resp.json();
+    const reply = d.content?.[0]?.text || 'Sorry, try again.';
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.querySelector('div:last-child').innerHTML = reply.replace(/\n/g,'<br>');
+  } catch(e) {
+    const thinkEl = document.getElementById(thinkId);
+    if (thinkEl) thinkEl.querySelector('div:last-child').textContent = 'Connection error.';
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function fillAI(text) {
+  const inp = document.getElementById('ai-input');
+  if (inp) inp.value = text;
+  showTab('ai', document.querySelector('.nav-item'));
+}
+
+// -- NAV ---------------------------------------------------
+const TITLES = {dashboard:'Dashboard',pipeline:'Pipeline',contacts:'Contacts',comms:'Communications',automation:'AutoTracks',ai:'AI Assistant',team:'Team',idx:'Property Alerts',reports:'Reports',plans:'Plans & Features'};
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab-view').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+name)?.classList.add('active');
+  document.getElementById('page-title').textContent = TITLES[name]||name;
+  if (el) el.classList.add('active');
+  if (name==='reports') loadReports();
+  if (name==='team') loadTeam();
+}
+
+// -- HELPERS -----------------------------------------------
+function typeBadge(t){const m={buyer:'rgba(26,158,92,.1)|#1A9E5C|rgba(26,158,92,.18)',seller:'rgba(123,63,160,.1)|#7B3FA0|rgba(123,63,160,.18)',both:'rgba(212,133,10,.1)|#D4850A|rgba(212,133,10,.18)',investor:'rgba(26,111,191,.1)|#1A6FBF|rgba(26,111,191,.18)',past_client:'rgba(26,111,191,.08)|#1A6FBF|rgba(26,111,191,.14)',renter:'rgba(26,111,191,.08)|#1A6FBF|rgba(26,111,191,.14)'};const[bg,c,b]=(m[t]||'rgba(90,90,90,.08)|#9AAABB|rgba(90,90,90,.1)').split('|');return`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:9px;background:${bg};color:${c};border:1px solid ${b}">${(t||'--').toUpperCase()}</span>`;}
+function stageBadge(s){const m={capture:'rgba(26,111,191,.1)|#1A6FBF',identify:'rgba(123,63,160,.1)|#7B3FA0',nurture:'rgba(212,133,10,.1)|#D4850A',convert:'rgba(208,53,53,.1)|#D03535',closed:'rgba(26,158,92,.1)|#1A9E5C',lost:'rgba(90,90,90,.08)|#9AAABB'};const[bg,c]=(m[s]||'rgba(90,90,90,.08)|#9AAABB').split('|');return`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:9px;background:${bg};color:${c};border:1px solid ${c}22">${(s||'--').toUpperCase()}</span>`;}
+function tempBadge(t){const m={hot:'rgba(208,53,53,.1)|#D03535',warm:'rgba(212,133,10,.1)|#D4850A',cold:'rgba(26,111,191,.1)|#1A6FBF'};const[bg,c]=(m[t]||'rgba(26,111,191,.1)|#1A6FBF').split('|');return`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:9px;background:${bg};color:${c};border:1px solid ${c}22">${(t||'cold').toUpperCase()}</span>`;}
+function srcLabel(s){return{referral:'Referral',google_ad:'Google Ad',facebook_ad:'Facebook Ad',zillow:'Zillow',open_house:'Open House',instagram:'Instagram',website:'Website',cold_call:'Cold Call',other:'Other'}[s]||s||'--';}
+function ago(ts){if(!ts)return'--';const d=Date.now()-new Date(ts).getTime(),m=Math.floor(d/60000),h=Math.floor(m/60),dy=Math.floor(h/24);if(dy>0)return dy===1?'Yesterday':dy+'d ago';if(h>0)return h+'h ago';if(m>0)return m+'m ago';return'Just now';}
+function toast(msg,type){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast on '+(type==='ok'?'ok':'err');setTimeout(()=>t.classList.remove('on'),3000);}
+
+function showComms() {
+  document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-comms').classList.add('active');
+  document.getElementById('page-title').textContent = 'Communications';
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.includes('Communications')) n.classList.add('active');
+  });
+}
+
+</script>
+</body>
+</html>
