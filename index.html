@@ -967,6 +967,7 @@ function showLogin() {
 }
 
 async function boot(user) {
+  console.log("boot called for:", user.email);
   CU = user;
   document.getElementById('login-screen').classList.remove('active');
   document.getElementById('app').classList.add('active'); document.getElementById('app').style.display='flex';
@@ -981,11 +982,17 @@ async function boot(user) {
 }
 
 async function loadAll() {
-  await loadProfiles();
-  await loadDash();
-  await loadPipeline();
-  await loadContacts();
-  await loadConvos();
+  console.log("loadAll starting, CU:", CU?.email);
+  try {
+    await loadProfiles();
+    await loadDash();
+    await loadPipeline();
+    await loadContacts();
+    await loadConvos();
+    console.log("loadAll complete");
+  } catch(e) {
+    console.error("loadAll error:", e);
+  }
 }
 
 async function handleLogin() {
@@ -1006,7 +1013,9 @@ async function handleLogout() {
 
 // -- PROFILES ----------------------------------------------
 async function loadProfiles() {
-  const { data } = await db.from('profiles').select('*').eq('is_active', true).order('full_name');
+  console.log("loadProfiles starting...");
+  const { data, error } = await db.from('profiles').select('*').eq('is_active', true).order('full_name');
+  console.log("profiles result:", data, error);
   profiles = data || [];
   const sel = document.getElementById('f-assign');
   if (sel) sel.innerHTML = profiles.map(p => `<option value="${p.id}">${p.full_name}</option>`).join('');
@@ -1017,7 +1026,9 @@ async function loadProfiles() {
 
 // -- DASHBOARD ---------------------------------------------
 async function loadDash() {
-  const { data: c } = await db.from('contacts').select('*').eq('is_active', true);
+  console.log("loadDash starting...");
+  const { data: c, error: ce } = await db.from('contacts').select('*').eq('is_active', true);
+  console.log("contacts result:", c, ce);
   contacts = c || [];
   const hot = contacts.filter(x => x.temperature === 'hot');
   const warm = contacts.filter(x => x.temperature === 'warm');
@@ -1131,7 +1142,8 @@ async function loadPipeline() {
 
 // -- CONTACTS ----------------------------------------------
 async function loadContacts() {
-  const { data } = await db.from('contacts').select('*,profiles!contacts_assigned_to_fkey(full_name)').eq('is_active',true).order('created_at',{ascending:false});
+  console.log("loadContacts starting...");
+  const { data, error } = await db.from('contacts').select('*,profiles!contacts_assigned_to_fkey(full_name)').eq('is_active',true).order('created_at',{ascending:false});
   contacts = data || [];
   renderContacts(contacts);
 }
